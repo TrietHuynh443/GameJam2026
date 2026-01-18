@@ -17,18 +17,42 @@ namespace SceneManagement
     }
     public class SceneLoader : PersistentMonoSingleton<SceneLoader>
     {
-        [SerializeField] private AssetReference _splashScene;
-        [SerializeField] private Image _backgroundHolder;
+        private Image _backgroundHolder;
+        private Slider _slider;
+
         private bool _isInitialize;
+        private readonly string _sceneKey = "Loader"; // Your Addressable Scene Key
+        
 
         protected override void Awake()
         {
             base.Awake();
-            if (_splashScene == null)
-            {
-                throw new NullReferenceException("Missing Reference");
-            }
+            _backgroundHolder = GetComponentInChildren<Image>();
+            _slider = GetComponentInChildren<Slider>();
+            Initialize().Forget();
+        }
+        
+        private async UniTaskVoid Initialize()
+        {
+    
+            var sizeHandle = Addressables.GetDownloadSizeAsync(_sceneKey);
+            
+            var downloadSize = await sizeHandle.ToUniTask();
+            
+            Debug.Log($"Get download size {downloadSize}");
+            Addressables.Release(sizeHandle);
 
+            if (downloadSize > 0)
+            {
+                await Addressables.DownloadDependenciesAsync(_sceneKey, autoReleaseHandle: true).ToUniTask(
+                        progress: new Progress<float>((p) =>
+                        {
+                            if (_slider) _slider.value = p;
+                        })
+                    );
+            }
+    
+            _backgroundHolder?.gameObject.SetActive(false);
             _isInitialize = true;
         }
 
@@ -39,13 +63,16 @@ namespace SceneManagement
 
         public async UniTaskVoid ChangeScene(EScene scene, Action onComplete = null)
         {
-            _backgroundHolder.gameObject.SetActive(true);
             await UniTask.WaitUntil(() => _isInitialize);
-            var sceneInstance = await Addressables.LoadSceneAsync(_splashScene, LoadSceneMode.Single);
-            _backgroundHolder.gameObject.SetActive(false);
+
+            var sceneInstance = await Addressables.LoadSceneAsync(_sceneKey);
+
             var changeSceneTask = ChangeSceneInternal(scene.AsSerialized());
-            var minTimeLoadTask = UniTask.WaitForSeconds(5);
+            
+            var minTimeLoadTask = UniTask.WaitForSeconds(3);
+            
             await UniTask.WhenAll(changeSceneTask, minTimeLoadTask);
+
             await Addressables.UnloadSceneAsync(sceneInstance);
         }
 
@@ -53,5 +80,6 @@ namespace SceneManagement
         {
             await SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
         }
+        
     }
 }
