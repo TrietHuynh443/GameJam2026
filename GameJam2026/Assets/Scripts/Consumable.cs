@@ -4,7 +4,7 @@ public class Consumable : MonoBehaviour
 {
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (!other.CompareTag("Consumer"))
+        if (!other.CompareTag("Player"))
             return;
 
         GameEvent.Publish(
