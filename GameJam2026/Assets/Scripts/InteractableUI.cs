@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using System;
 
 [RequireComponent(typeof(RectTransform))]
 public class InteractableUI : MonoBehaviour,
@@ -10,6 +11,12 @@ public class InteractableUI : MonoBehaviour,
     IPointerUpHandler,
     IPointerClickHandler
 {
+    public event Action<InteractableUI> OnHoverEnter;
+    public event Action<InteractableUI> OnHoverExit;
+    public event Action<InteractableUI> OnPressed;
+    public event Action<InteractableUI> OnReleased;
+    public event Action<InteractableUI> OnTapped;
+
     [Header("Scale")]
     public float hoverScale = 1.1f;
     public float pressScale = 0.95f;
@@ -78,26 +85,32 @@ public class InteractableUI : MonoBehaviour,
     public void OnPointerEnter(PointerEventData eventData)
     {
         _hovered = true;
+        OnHoverEnter?.Invoke(this);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         _hovered = false;
         _pressed = false;
+        OnHoverExit?.Invoke(this);
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
         _pressed = true;
+        OnPressed?.Invoke(this);
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
         _pressed = false;
+        OnReleased?.Invoke(this);
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
         _tapped = !_tapped;
+        OnTapped?.Invoke(this);
     }
+
 }
