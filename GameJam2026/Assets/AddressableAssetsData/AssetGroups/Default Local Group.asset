@@ -564,7 +564,8 @@ MonoBehaviour:
   - m_GUID: 97822f746f8d8497fb631c93cf5c68d7
     m_Address: Assets/Scenes/Loader.unity
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - Loader
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 98d40b89a711d5b46bc96d61e8a4f75b
     m_Address: Assets/FeonY/Animated Pixel-Art Backgrounds/Art/Animations/Pixel-Art
