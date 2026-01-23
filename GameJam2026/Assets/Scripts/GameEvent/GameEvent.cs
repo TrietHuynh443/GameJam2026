@@ -1,51 +1,55 @@
 using System;
 using System.Collections.Generic;
+using GameEvent.Events;
 
-public static class GameEvent
+namespace GameEvent
 {
-    private static readonly Dictionary<Type, List<Delegate>> _handlers = new();
-
-    public static void Subscribe<T>(Action<T> handler)
+    public static class GameEvent
     {
-        var type = typeof(T);
+        private static readonly Dictionary<Type, List<Delegate>> _handlers = new();
 
-        if (!_handlers.TryGetValue(type, out var list))
+        public static void Subscribe<T>(Action<T> handler) where T : IEvent
         {
-            list = new List<Delegate>();
-            _handlers[type] = list;
+            var type = typeof(T);
+
+            if (!_handlers.TryGetValue(type, out var list))
+            {
+                list = new List<Delegate>();
+                _handlers[type] = list;
+            }
+
+            if (!list.Contains(handler))
+                list.Add(handler);
         }
 
-        if (!list.Contains(handler))
-            list.Add(handler);
-    }
-
-    public static void Unsubscribe<T>(Action<T> handler)
-    {
-        var type = typeof(T);
-
-        if (_handlers.TryGetValue(type, out var list))
+        public static void Unsubscribe<T>(Action<T> handler) where T : IEvent
         {
-            list.Remove(handler);
+            var type = typeof(T);
 
-            if (list.Count == 0)
-                _handlers.Remove(type);
+            if (_handlers.TryGetValue(type, out var list))
+            {
+                list.Remove(handler);
+
+                if (list.Count == 0)
+                    _handlers.Remove(type);
+            }
         }
-    }
 
-    public static void Publish<T>(T evt)
-    {
-        if (!_handlers.TryGetValue(typeof(T), out var list))
-            return;
+        public static void Publish<T>(T evt) where T : IEvent
+        {
+            if (!_handlers.TryGetValue(typeof(T), out var list))
+                return;
 
-        // COPY to prevent modification during iteration
-        var snapshot = list.ToArray();
+            // COPY to prevent modification during iteration
+            var snapshot = list.ToArray();
 
-        foreach (Action<T> handler in snapshot)
-            handler.Invoke(evt);
-    }
+            foreach (var handler in snapshot)
+                handler.DynamicInvoke(evt);
+        }
 
-    public static void Clear()
-    {
-        _handlers.Clear();
+        public static void Clear()
+        {
+            _handlers.Clear();
+        }
     }
 }

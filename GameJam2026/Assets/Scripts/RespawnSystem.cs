@@ -1,5 +1,5 @@
 using UnityEngine;
-
+using GameEvent;
 public class RespawnSystem : MonoBehaviour
 {
     public Vector2 minBounds;
@@ -7,12 +7,12 @@ public class RespawnSystem : MonoBehaviour
 
     private void OnEnable()
     {
-        GameEvent.Subscribe<EntityConsumedEvent>(OnConsumed);
+        GameEvent.GameEvent.Subscribe<EntityConsumedEvent>(OnConsumed);
     }
 
     private void OnDisable()
     {
-        GameEvent.Unsubscribe<EntityConsumedEvent>(OnConsumed);
+        GameEvent.GameEvent.Unsubscribe<EntityConsumedEvent>(OnConsumed);
     }
 
     private void OnConsumed(EntityConsumedEvent evt)

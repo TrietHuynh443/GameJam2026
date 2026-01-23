@@ -6,9 +6,9 @@ public class Consumable : MonoBehaviour
     {
         if (!other.CompareTag("Player"))
             return;
-
-        GameEvent.Publish(
+        GameEvent.GameEvent.Publish<EntityConsumedEvent>(
             new EntityConsumedEvent(other.gameObject, gameObject)
         );
+
     }
 }

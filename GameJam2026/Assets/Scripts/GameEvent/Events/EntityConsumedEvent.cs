@@ -1,6 +1,7 @@
+using GameEvent.Events;
 using UnityEngine;
 
-public struct EntityConsumedEvent
+public struct EntityConsumedEvent : IEvent
 {
     public GameObject Consumer;
     public GameObject Consumed;

@@ -6,12 +6,12 @@ public class ScoreSystem : MonoBehaviour
 
     private void OnEnable()
     {
-        GameEvent.Subscribe<EntityConsumedEvent>(ScorePoint);
+        GameEvent.GameEvent.Subscribe<EntityConsumedEvent>(ScorePoint);
     }
 
     private void OnDisable()
     {
-        GameEvent.Unsubscribe<EntityConsumedEvent>(ScorePoint);
+        GameEvent.GameEvent.Unsubscribe<EntityConsumedEvent>(ScorePoint);
     }
 
     private void ScorePoint(EntityConsumedEvent evt)
