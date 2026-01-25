@@ -6,6 +6,7 @@ using Extension;
 using GameEvent.Events;
 using Unity.VisualScripting;
 using UnityCommunity.UnitySingleton;
+using UnityEngine;
 
 namespace PlayerResources
 {
@@ -20,7 +21,7 @@ namespace PlayerResources
 
             _playerResourcesMap.AddRange(assembly.GetClassesOfType<PlayerResources>().Select(x =>
             {
-                var instance = (PlayerResources)assembly.CreateInstance(x.Name);
+                var instance = (PlayerResources)Activator.CreateInstance(x);
                 return new KeyValuePair<Type, PlayerResources>(x, instance);
             }));
 

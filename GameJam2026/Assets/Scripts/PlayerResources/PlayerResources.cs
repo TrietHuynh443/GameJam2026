@@ -9,8 +9,8 @@ namespace PlayerResources
 
         public virtual float Current()
         {
-            var res = Amount + Amount * GrowRate;
-            return res;
+            Amount += Amount * GrowRate;
+            return Amount;
         }
 
         public abstract void UpdateResource(PlayerResourceChangeReason reason, float amount);
