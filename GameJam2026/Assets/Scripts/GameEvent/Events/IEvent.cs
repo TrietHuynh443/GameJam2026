@@ -4,4 +4,9 @@ namespace GameEvent.Events
     {
         
     }
+
+    public struct NextDaysEvent : IEvent
+    {
+        public int Days { get; set; }
+    }
 }
