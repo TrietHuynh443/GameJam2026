@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class ScoreSystem : MonoBehaviour
 {
-    public int Score { get; private set; }
+    public int Score;
 
     private void OnEnable()
     {
@@ -16,8 +16,6 @@ public class ScoreSystem : MonoBehaviour
 
     private void ScorePoint(EntityConsumedEvent evt)
     {
-        // Rules can grow later
         Score += 1;
-        Debug.Log($"Score: {Score}");
     }
 }
