@@ -1,51 +1,40 @@
-using GameEvent;
-using GameEvent.Events;
 using UnityEngine;
 
-[RequireComponent(typeof(Collider2D))]
-public class TriggerObject : MonoBehaviour
+namespace Trigger
 {
-    public TriggerEventType triggerType;
-
-    private int triggeredLayer;
-
-    private void Awake()
+    [RequireComponent(typeof(Collider2D))]
+    public class TriggerObject : MonoBehaviour
     {
-        triggeredLayer = LayerMask.NameToLayer("Triggered");
-    }
+        public TriggerEventType triggerType;
+        private int triggeredLayer;
 
-    private void Reset()
-    {
-        GetComponent<Collider2D>().isTrigger = true;
-    }
+        private void Awake()
+        {
+            triggeredLayer = LayerMask.NameToLayer("Triggered");
+        }
 
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        RaiseEvent(other, TriggerPhase.Enter);
-    }
+        private void Reset()
+        {
+            GetComponent<Collider2D>().isTrigger = true;
+        }
 
-    private void OnTriggerStay2D(Collider2D other)
-    {
-        RaiseEvent(other, TriggerPhase.Stay);
-    }
-
-    private void OnTriggerExit2D(Collider2D other)
-    {
-        RaiseEvent(other, TriggerPhase.Exit);
-    }
-
-    private void RaiseEvent(Collider2D other, TriggerPhase phase)
-    {
-        if (other.gameObject.layer != triggeredLayer)
-            return;
-
-        EventManager.Raise(
-            new TriggerEvent(
-                this,
-                other.gameObject,
-                triggerType,
-                phase
-            )
-        );
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            RaiseEvent(other, TriggerPhase.Enter);
+        }
+        private void OnTriggerStay2D(Collider2D other)
+        {
+            RaiseEvent(other, TriggerPhase.Stay);
+        }
+        private void OnTriggerExit2D(Collider2D other)
+        {
+            RaiseEvent(other, TriggerPhase.Exit);
+        }
+        private void RaiseEvent(Collider2D other, TriggerPhase phase)
+        {
+            if (other.gameObject.layer != triggeredLayer) return;
+            TriggerEvent evt = new TriggerEvent(this, other.gameObject, triggerType, phase);
+            GameEvent.GameEvent.Publish(evt);
+        }
     }
 }
