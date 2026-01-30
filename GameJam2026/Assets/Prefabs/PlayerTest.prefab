@@ -14,7 +14,8 @@ GameObject:
   - component: {fileID: 3420208368059371756}
   - component: {fileID: 3567441263654411864}
   - component: {fileID: 791028798064362755}
-  m_Layer: 0
+  - component: {fileID: 6268898532338738787}
+  m_Layer: 9
   m_Name: PlayerTest
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -104,7 +105,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   InputActions: {fileID: -944628639613478452, guid: 3590b91b4603b465dbb4216d601bff33, type: 3}
-  walkSpeed: 30
+  walkSpeed: 15
+  sprintMultiplier: 1.6
 --- !u!61 &3420208368059371756
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -179,6 +181,19 @@ Rigidbody2D:
   m_CollisionDetection: 0
   m_Constraints: 4
 --- !u!114 &791028798064362755
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5168026608653110851}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61e69e0fd8d42cb4db9c00a5e7541740, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  triggerType: 3
+--- !u!114 &6268898532338738787
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
