@@ -1,3 +1,6 @@
+using Human;
+using UnityEngine;
+
 namespace GameEvent.Events
 {
     public interface IEvent
@@ -8,5 +11,15 @@ namespace GameEvent.Events
     public struct NextDaysEvent : IEvent
     {
         public int Days { get; set; }
+    }
+
+    public struct InfectedEvent : IEvent
+    {
+        public GameObject Human;
+
+        public InfectedEvent(GameObject human)
+        {
+            Human = human;
+        }
     }
 }

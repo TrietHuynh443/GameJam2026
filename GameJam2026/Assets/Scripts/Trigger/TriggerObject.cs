@@ -32,7 +32,6 @@ namespace Trigger
         }
         private void RaiseEvent(Collider2D other, TriggerPhase phase)
         {
-            if (other.gameObject.layer != triggeredLayer) return;
             TriggerEvent evt = new TriggerEvent(this, other.gameObject, triggerType, phase);
             GameEvent.GameEvent.Publish(evt);
         }

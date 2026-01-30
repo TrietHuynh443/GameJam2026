@@ -39,21 +39,31 @@ namespace Trigger
                 case TriggerEventType.ApplyMask:
                     HandleApplyMask(evt);
                     break;
-
+                case TriggerEventType.Infect:
+                    HandleInfected(evt);
+                    break;
                 default:
                     Debug.LogWarning($"Unhandled TriggerEventType: {evt.EventType}");
                     break;
             }
         }
 
-        #region Handlers
 
+
+        #region Handlers
+        private void HandleInfected(TriggerEvent evt)
+        {
+            if (evt.Phase != TriggerPhase.Enter)
+                return;
+            GameEvent.GameEvent.Publish(new InfectedEvent(evt.TriggeredObject));
+
+        }
         private void HandleApplyMask(TriggerEvent evt)
         {
             if (evt.Phase != TriggerPhase.Enter)
                 return;
 
-            GameEvent.GameEvent.Publish(new EntityMaskedEvent(evt.TriggeredObject.GetComponent<HumanNormal>()));
+            GameEvent.GameEvent.Publish(new EntityMaskedEvent(evt.TriggeredObject));
         }
 
         #endregion
