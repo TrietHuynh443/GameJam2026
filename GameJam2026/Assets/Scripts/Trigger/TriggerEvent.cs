@@ -27,7 +27,8 @@ namespace Trigger
     public enum TriggerEventType
     {
         None,
-        ApplyMask
+        ApplyMask,
+        Fight
     }
 
     public enum TriggerPhase

@@ -39,7 +39,10 @@ namespace Trigger
                 case TriggerEventType.ApplyMask:
                     HandleApplyMask(evt);
                     break;
-
+                case TriggerEventType.Fight:
+                    HandleFight(evt);
+                    break;
+                
                 default:
                     Debug.LogWarning($"Unhandled TriggerEventType: {evt.EventType}");
                     break;
@@ -54,6 +57,14 @@ namespace Trigger
                 return;
 
             GameEvent.GameEvent.Publish(new EntityMaskedEvent(evt.TriggeredObject.GetComponent<HumanNormal>()));
+        }
+        
+        private void HandleFight(TriggerEvent evt)
+        {
+            if (evt.Phase != TriggerPhase.Enter)
+                return;
+
+            GameEvent.GameEvent.Publish(new EntityFightEvent(evt.TriggeredObject.GetComponent<HumanAngry>()));
         }
 
         #endregion

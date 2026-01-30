@@ -28,12 +28,12 @@ namespace Human
             new Vector2(-1, -1),
         };
         
-        private void OnEnable()
+        protected virtual void OnEnable()
         {
             GameEvent.GameEvent.Subscribe<EntityMaskedEvent>(WearMask);
         }
 
-        private void OnDisable()
+        protected virtual void OnDisable()
         {
             GameEvent.GameEvent.Unsubscribe<EntityMaskedEvent>(WearMask);
         }
@@ -70,7 +70,7 @@ namespace Human
             _moveDirection = Directions[Random.Range(0, Directions.Length)].normalized;
         }
 
-        private void WearMask(EntityMaskedEvent evt)
+        protected virtual void WearMask(EntityMaskedEvent evt)
         {
             if (evt.HumanNormal != this)
             {
