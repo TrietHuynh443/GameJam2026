@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour
     [Header("Spawn Area")]
     public Vector2 minSpawn;
     public Vector2 maxSpawn;
+    [SerializeField] private Transform spawnContainer;
 
     private ObjectPool<NPCStateController> _npcPool;
     
@@ -29,7 +30,7 @@ public class GameManager : MonoBehaviour
         _npcPool = new ObjectPool<NPCStateController>(
             npcPrefab,
             poolSize,
-            transform
+            spawnContainer
         );
 
         _score = new PlayerScore();

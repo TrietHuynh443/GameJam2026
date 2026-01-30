@@ -761,6 +761,7 @@ MonoBehaviour:
   sickCount: 2
   minSpawn: {x: -40, y: -20}
   maxSpawn: {x: 40, y: 20}
+  spawnContainer: {fileID: 1854661287}
   score: 0
 --- !u!213 &1469106345
 Sprite:
