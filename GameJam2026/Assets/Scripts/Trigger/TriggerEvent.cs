@@ -27,11 +27,7 @@ namespace Trigger
     public enum TriggerEventType
     {
         None,
-        Door,
-        DamageZone,
-        Dialogue,
-        Checkpoint,
-        Point
+        ApplyMask
     }
 
     public enum TriggerPhase

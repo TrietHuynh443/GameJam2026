@@ -1,21 +1,22 @@
 using UnityEngine;
+using GameEvent.Events;
 
 public class ScoreSystem : MonoBehaviour
 {
-    public int Score;
+    public int score;
 
     private void OnEnable()
     {
-        GameEvent.GameEvent.Subscribe<EntityConsumedEvent>(ScorePoint);
+        GameEvent.GameEvent.Subscribe<ScoreEvent>(ScorePoint);
     }
 
     private void OnDisable()
     {
-        GameEvent.GameEvent.Unsubscribe<EntityConsumedEvent>(ScorePoint);
+        GameEvent.GameEvent.Unsubscribe<ScoreEvent>(ScorePoint);
     }
 
-    private void ScorePoint(EntityConsumedEvent evt)
+    private void ScorePoint(ScoreEvent evt)
     {
-        Score += 1;
+        score += 1;
     }
 }
