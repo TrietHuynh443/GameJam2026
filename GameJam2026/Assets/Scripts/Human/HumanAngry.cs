@@ -3,69 +3,124 @@ using UnityEngine;
 
 namespace Human
 {
-    public class HumanAngry : HumanNormal
+    public class HumanAngry : MonoBehaviour, IHuman
     {
-        private bool _canWearMask = true;
-        [Range(0f, 1f)]
-        public float blockMaskChance = 0.5f;
+        public bool isMasked = false;
+    
+        [Header("Movement")]
+        public float moveSpeed = 10f;
+        public float changeDirectionTime = 5f;
+        public Vector2 minBounds = new Vector2(-80, -40);
+        public Vector2 maxBounds = new Vector2(80, 40);
 
-        public float blockDuration = 3f;
+        private HumanDirectionType _moveDirection;
+        private float _timer;
+        private bool _isFaceWall = false;
+        [SerializeField] private Transform _transform;
+        private SickHuman _sickHuman;
+        private HumanNormal _normalHuman;
         
-        protected override void OnEnable()
+        [Header("Block Mask Params")]
+        public float angryDuration = 5f;
+        
+        private void Start()
         {
-            base.OnEnable();
+            _sickHuman = _transform.GetComponentInChildren<SickHuman>(includeInactive: true);
+            _normalHuman = _transform.GetComponentInChildren<HumanNormal>(includeInactive: true);
+            StopAllCoroutines();
+            StartCoroutine(CalmDownAfterTime());
+        }
+        
+        private void OnEnable()
+        {
             GameEvent.GameEvent.Subscribe<EntityFightEvent>(Fight);
+            GameEvent.GameEvent.Subscribe<InfectedEvent>(Infected);
+
         }
 
-        protected override void OnDisable()
+        private void OnDisable()
         {
-            base.OnDisable();
             GameEvent.GameEvent.Unsubscribe<EntityFightEvent>(Fight);
+            GameEvent.GameEvent.Unsubscribe<InfectedEvent>(Infected);
         }
-
-        protected override void WearMask(EntityMaskedEvent evt)
+        private void Infected(InfectedEvent obj)
         {
-            if (evt.HumanNormal != this)
-                return;
-
-            if (!_canWearMask)
+            Debug.Log("Infected ");
+            if (obj.Human != gameObject)
             {
-                Debug.Log($"{name} refuses to wear a mask right now");
                 return;
             }
 
             if (isMasked)
             {
-                Debug.Log("I already wear a mask!");
+                isMasked = false;
                 return;
             }
 
-            isMasked = true;
-            GameEvent.GameEvent.Publish(new ScoreEvent(this));
+            gameObject.SetActive(false);
+            _sickHuman.gameObject.SetActive(true);
+        }
+        
+        void FixedUpdate()
+        {
+            _timer += Time.fixedDeltaTime;
+
+            if (_timer >= changeDirectionTime)
+            {
+                _moveDirection = GetDirection();
+                _timer = 0f;
+            }
+
+            Vector3 nextPos = transform.position + (Vector3)(HumanDirectionExtension.DirectionMap[_moveDirection] * moveSpeed * Time.fixedDeltaTime);
+            
+            if (nextPos.x < minBounds.x || nextPos.x > maxBounds.x ||
+                nextPos.y < minBounds.y || nextPos.y > maxBounds.y)
+            {
+                _moveDirection = GetDirection();
+                return;
+            }
+
+            _transform.position = nextPos;
+        }
+
+        private HumanDirectionType GetDirection()
+        {
+            if (_isFaceWall)
+            {
+                _isFaceWall = false;
+                return HumanDirectionExtension.GetReverseDirection(_moveDirection);
+            }
+
+            return (HumanDirectionType)Random.Range(0, 7);
+        }
+
+        public void Back()
+        {
+            _isFaceWall = true;
         }
         
         private void Fight(EntityFightEvent evt)
         {
-            if (evt.HumanAngry != this)
+            if (evt.HumanAngry != gameObject)
                 return;
 
-            Debug.Log($"{name} is ANGRY 😡");
-
-            if (Random.value < blockMaskChance)
+            if (isMasked)
             {
-                Debug.Log($"{name} is too angry to wear a mask!");
-                StopAllCoroutines();
-                StartCoroutine(BlockMaskTemporarily());
+                Debug.Log($"{name} already 😡 wear a mask but your insist make him throw it away");
+                isMasked = false;
+                return;
             }
+
+            Debug.Log($"{name} is too ANGRY 😡 to wear a mask!");
         }
 
-        private System.Collections.IEnumerator BlockMaskTemporarily()
+        private System.Collections.IEnumerator CalmDownAfterTime()
         {
-            _canWearMask = false;
-            yield return new WaitForSeconds(blockDuration);
-            _canWearMask = true;
-            blockMaskChance = 0f;
+            yield return new WaitForSeconds(angryDuration);
             Debug.Log($"{name} calmed down 😮‍💨");
+            _normalHuman.gameObject.SetActive(true);
+            _normalHuman.isMasked = isMasked;
+            gameObject.SetActive(false);
         }
     }
 }

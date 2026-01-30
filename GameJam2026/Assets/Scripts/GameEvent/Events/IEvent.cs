@@ -1,4 +1,5 @@
 using Human;
+using UnityEngine;
 
 namespace GameEvent.Events
 {
@@ -6,19 +7,51 @@ namespace GameEvent.Events
     {
         
     }
+    
+    public struct ScoreEvent : IEvent
+    {
+        public int Infected;
+        public int Masked;
+
+        public ScoreEvent(int infected, int masked)
+        {
+            Infected = infected;
+            Masked = masked;
+        }
+    }
 
     public struct NextDaysEvent : IEvent
     {
         public int Days { get; set; }
     }
     
+    public struct EntityMaskedEvent : IEvent
+    {
+        public GameObject HumanNormal;
+
+        public EntityMaskedEvent(GameObject humanNormal)
+        {
+            HumanNormal = humanNormal;
+        }
+    }
+
     public struct EntityFightEvent : IEvent
     {
-        public HumanAngry HumanAngry;
+        public GameObject HumanAngry;
 
-        public EntityFightEvent(HumanAngry humanAngry)
+        public EntityFightEvent(GameObject humanAngry)
         {
             HumanAngry = humanAngry;
+        }
+    }
+
+    public struct InfectedEvent : IEvent
+    {
+        public GameObject Human;
+
+        public InfectedEvent(GameObject human)
+        {
+            Human = human;
         }
     }
 }

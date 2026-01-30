@@ -28,7 +28,8 @@ namespace Trigger
     {
         None,
         ApplyMask,
-        Fight
+        Infect,
+        Fight,
     }
 
     public enum TriggerPhase
