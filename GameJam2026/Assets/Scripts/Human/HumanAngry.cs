@@ -37,7 +37,7 @@ namespace Human
         }
         public void Infected()
         {
-            if (_controller.isMasked)
+            if (_controller.isMasked > 0)
             {
                 return;
             }
@@ -107,10 +107,11 @@ namespace Human
             if (evt.HumanNormal != gameObject)
                 return;
 
-            if (_controller.isMasked)
+            if (_controller.isMasked > 0)
             {
                 _controller.SetBubble(BubbleState.Angry);
-                _controller.isMasked = false;
+                _controller.isMasked = 0;
+                Debug.Log($"{name} throw away the mask!");
                 GameEvent.GameEvent.Publish(new ScoreEvent(0, -1, 0));
                 return;
             }

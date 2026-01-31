@@ -24,9 +24,9 @@ namespace Human
 
         public void Infected()
         {
-            if (_controller.isMasked)
+            if (_controller.isMasked > 0)
             {
-                Debug.Log("My mask effect wear off!");
+                Debug.Log("My mask protected me!");
                 return;
             }
             

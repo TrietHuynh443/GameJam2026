@@ -25,9 +25,8 @@ namespace Human
 
     public class NPCStateController : MonoBehaviour
     {
-        public bool isMasked = false;
+        public int isMasked;
         public bool isBeingDragged = false;
-        public bool isImmune = false;
         private Transform _dragSource;
 
         [Header("State Objects")]
@@ -61,7 +60,7 @@ namespace Human
         [SerializeField] private GameObject _healIcon;
         [SerializeField] private GameObject _deadIcon;
         
-        [SerializeField] private GameObject _feverObject;
+        [SerializeField] private GameObject _auraObject;
         [SerializeField] private GameObject _angryObject;
         
         private bool _isWaiting = false;
@@ -70,13 +69,20 @@ namespace Human
         [Header("After Cure Movement")]
         [SerializeField] private List<Vector2> curedDestinations;
         [SerializeField] private float moveToCuredSpeed = 2.5f;
-        [SerializeField] private float fadeOutDuration = 0.5f;
+        [SerializeField] private float fadeOutDuration = 1f;
 
         private Coroutine _moveAfterCureRoutine;
         private Coroutine _fadeOutRoutine;
         private bool _isMovingAfterCure;
-
         
+        [Header("Dead Timer")]
+        [SerializeField] private float deadDuration = 120f;
+
+        private float _deadTimer;
+        private bool _isDeadCounting;
+        private SpriteRenderer _auraRenderer;
+        private readonly Color _feverColor = new Color32(119, 106, 162, 147);
+
         [Header("Fade In")]
         [SerializeField] private float fadeInDuration = 0.5f;
         private Coroutine _fadeRoutine;
@@ -106,6 +112,10 @@ namespace Human
         private void Awake()
         {
             if (!_animator) return;
+            
+            if (_auraObject != null)
+                _auraRenderer = _auraObject.GetComponent<SpriteRenderer>();
+            
             if (skinControllers == null || skinControllers.Count == 0)
             {
                 Debug.LogWarning("No skin controllers assigned.");
@@ -126,14 +136,14 @@ namespace Human
         {
             if (evt.HumanNormal.transform.parent?.gameObject != gameObject 
                 || currentState == HumanState.Sick
-                || isMasked)
+                || isMasked > 0)
                 return;
 
             if (currentState is HumanState.Angry)
                 _angryHuman.Fight(evt);
             else
             {
-                isMasked = true;
+                isMasked += 10;
                 SetBubble(BubbleState.Masked);
                 SoundManager.Instance.PlaySoundEffect(SoundEffectType.Masked);
                 GameEvent.GameEvent.Publish(new ScoreEvent(0, 1, 0));
@@ -144,24 +154,24 @@ namespace Human
 
         private void OnInfected(InfectedEvent obj)
         {
-            if(obj.Human.transform.parent?.gameObject != gameObject || _current is SickHuman || isImmune) 
+            if(obj.Human.transform.parent?.gameObject != gameObject || _current is SickHuman) 
                 return;
-            
-            if (isMasked)
+
+            if (isMasked > 0)
             {
-                isMasked = false;
-                GameEvent.GameEvent.Publish<ScoreEvent>(new ScoreEvent(0, -1, 0));
+                isMasked -= 1;
+                if (isMasked == 0) 
+                    GameEvent.GameEvent.Publish<ScoreEvent>(new ScoreEvent(0, -1, 0));
             }
             else
             {
                 GameEvent.GameEvent.Publish<ScoreEvent>(new ScoreEvent(1, 0, -1));
+                SetState(HumanState.Sick);
+                StartCoroutine(WaitAndTurn());
+                SetBubble(BubbleState.Sick);
             }
             
-            SetState(HumanState.Sick);
-            
-            SetBubble(BubbleState.Sick);
-            
-            StartCoroutine(WaitAndTurn());
+
         }
 
         private void OnDrag(EntityDragEvent evt)
@@ -191,7 +201,6 @@ namespace Human
             if (_isMovingAfterCure)
                 return;
 
-            isImmune = true;
             _sickHuman.Cured();
 
             StartCoroutine(WaitTillRelease());
@@ -201,7 +210,8 @@ namespace Human
         {
             if (evt.Target.transform.parent?.gameObject != gameObject)
                 return;
-            
+            SetBubble(BubbleState.Dead, 1f);
+
             StartCoroutine(FadeOutAndDisable());
         }
 
@@ -212,8 +222,8 @@ namespace Human
             _angryIcon.SetActive(state == BubbleState.Angry);
             _maskedIcon.SetActive(state == BubbleState.Masked);
             _sickIcon.SetActive(state == BubbleState.Sick);
-            _sickIcon.SetActive(state == BubbleState.Healing);
-            _sickIcon.SetActive(state == BubbleState.Dead);
+            _healIcon.SetActive(state == BubbleState.Healing);
+            _deadIcon.SetActive(state == BubbleState.Dead);
             _bubble.SetActive(true);
             UniTask.WaitForSeconds(duration).ContinueWith(() => _bubble.SetActive(false));
         }
@@ -253,16 +263,19 @@ namespace Human
 
             float time = 0f;
             float startAlpha = spriteRenderer.color.a;
+            float startAlphaAura = _auraRenderer.color.a;
 
             while (time < fadeOutDuration)
             {
                 time += Time.deltaTime;
                 float t = time / fadeOutDuration;
                 SetAlpha(Mathf.Lerp(startAlpha, 0f, t));
+                SetAlphaAura(Mathf.Lerp(startAlphaAura, 0f, t));
                 yield return null;
             }
 
             SetAlpha(0f);
+            SetAlphaAura(0f);
             _isMovingAfterCure = false;
 
             gameObject.SetActive(false); // returned to pool AFTER fade
@@ -277,6 +290,15 @@ namespace Human
             c.a = alpha;
             spriteRenderer.color = c;
         }
+        
+        private void SetAlphaAura(float alpha)
+        {
+            if (_auraRenderer == null) return;
+
+            Color c = _auraRenderer.color;
+            c.a = alpha;
+            _auraRenderer.color = c;
+        }
 
         public void SetState(HumanState state)
         {
@@ -285,7 +307,10 @@ namespace Human
             {
                 case HumanState.Normal:
                     _current = _normalHuman;
+                    _isDeadCounting = false;
                     break;
+
+
 
                 case HumanState.Angry:
                     _current = _angryHuman;
@@ -294,6 +319,12 @@ namespace Human
 
                 case HumanState.Sick:
                     _current = _sickHuman;
+
+                    if (_auraRenderer != null)
+                        _auraRenderer.color = _feverColor;
+
+                    _deadTimer = 0f;
+                    _isDeadCounting = true;
                     break;
             }
 
@@ -301,12 +332,32 @@ namespace Human
             angry.SetActive(state == HumanState.Angry);
             sick.SetActive(state == HumanState.Sick);
         }
+        
+        private void Update()
+        {
+            if (!_isDeadCounting || currentState != HumanState.Sick)
+                return;
+
+            _deadTimer += Time.deltaTime;
+
+            float t = Mathf.Clamp01(_deadTimer / deadDuration);
+
+            // Lerp fever color → black
+            if (_auraRenderer != null)
+                _auraRenderer.color = Color.Lerp(_feverColor, Color.black, t);
+
+            if (_deadTimer >= deadDuration)
+            {
+                _isDeadCounting = false;
+                _sickHuman.Dead();
+            }
+        }
 
 
         private void FixedUpdate()
         {
-            _maskedObject.SetActive(isMasked);
-            _feverObject.SetActive(currentState is HumanState.Sick);
+            _maskedObject.SetActive(isMasked > 0);
+            _auraObject.SetActive(currentState is HumanState.Sick);
             _angryObject.SetActive(currentState is HumanState.Angry);
 
             if (_isMovingAfterCure)
@@ -391,8 +442,8 @@ namespace Human
         private IEnumerator MoveAfterCure()
         {
             Vector2 destination = GetNearestCuredDestination();
-            yield return new WaitForSeconds(2f);
-            SetBubble(BubbleState.Masked);
+            SetBubble(BubbleState.Healing, 3f);
+            yield return new WaitForSeconds(3f);
 
             _isMovingAfterCure = true;
 
