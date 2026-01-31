@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using GameEvent.Events;
 using Sound;
-using UnityEditor.Animations;
 using UnityEngine;
 
 namespace Human
@@ -38,7 +37,7 @@ namespace Human
         [SerializeField] private SpriteRenderer spriteRenderer;
         
         [Header("Skins")]
-        [SerializeField] private List<AnimatorController> skinControllers;
+        [SerializeField] private List<RuntimeAnimatorController> skinControllers;
 
         [Header("State Sprites")]
         [SerializeField] private Sprite normalSprite; // Tilesets_91
