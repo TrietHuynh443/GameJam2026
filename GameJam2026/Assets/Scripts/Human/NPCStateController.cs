@@ -3,6 +3,7 @@ using System.Collections;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using GameEvent.Events;
+using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -25,6 +26,9 @@ namespace Human
     public class NPCStateController : MonoBehaviour
     {
         public bool isMasked = false;
+        public bool isBeingDragged = false;
+        private Transform _dragSource;
+
         [Header("State Objects")]
         [SerializeField] private GameObject normal;
         [SerializeField] private GameObject angry;
@@ -58,6 +62,8 @@ namespace Human
             }
             GameEvent.GameEvent.Subscribe<InfectedEvent>(OnInfected);
             GameEvent.GameEvent.Subscribe<EntityMaskedEvent>(OnMasked);
+            GameEvent.GameEvent.Subscribe<EntityDragEvent>(OnDrag);
+            GameEvent.GameEvent.Subscribe<EntityStopDragEvent>(OnStopDrag);
         }
 
 
@@ -97,6 +103,26 @@ namespace Human
 
         }
 
+        private void OnDrag(EntityDragEvent evt)
+        {
+            // Only react if THIS NPC is the target
+            if (evt.Target.transform.parent?.gameObject != gameObject)
+                return;
+
+            isBeingDragged = true;
+            _dragSource = evt.Source.transform;
+        }
+
+        private void OnStopDrag(EntityStopDragEvent evt)
+        {
+            if (evt.Target.transform.parent?.gameObject != gameObject)
+                return;
+
+            isBeingDragged = false;
+            _dragSource = null;
+        }
+
+
         private void SetBubble(BubbleState state)
         {
             _angryIcon.SetActive(state == BubbleState.Angry);
@@ -112,6 +138,9 @@ namespace Human
         {
             GameEvent.GameEvent.Unsubscribe<InfectedEvent>(OnInfected);
             GameEvent.GameEvent.Unsubscribe<EntityMaskedEvent>(OnMasked);
+            GameEvent.GameEvent.Unsubscribe<EntityDragEvent>(OnDrag);
+            GameEvent.GameEvent.Unsubscribe<EntityStopDragEvent>(OnStopDrag);
+
         }
 
         public void SetState(HumanState state)
@@ -141,14 +170,26 @@ namespace Human
         private bool _isWaiting = false;
         private void FixedUpdate()
         {
+            if (isBeingDragged && _dragSource != null)
+            {
+                // Follow player
+                transform.position = Vector3.Lerp(
+                    transform.position,
+                    _dragSource.position,
+                    15f * Time.fixedDeltaTime
+                );
+                return;
+            }
+
             if (_isWaiting)
             {
                 _current.RotateAround();
                 return;
             }
-            
+
             _current.Move();
         }
+
 
         public bool CheckObstacle(Vector2 dir)
         {

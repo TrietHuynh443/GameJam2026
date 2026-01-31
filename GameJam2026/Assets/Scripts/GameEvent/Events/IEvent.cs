@@ -54,4 +54,27 @@ namespace GameEvent.Events
             Human = human;
         }
     }
+    
+    public struct EntityDragEvent : IEvent
+    {
+        public GameObject Source;
+        public GameObject Target;
+
+        public EntityDragEvent(GameObject source, GameObject target)
+        {
+            Source = source;
+            Target = target;
+        }
+    }
+    
+    public struct EntityStopDragEvent : IEvent
+    {
+        public GameObject Target;
+
+        public EntityStopDragEvent(GameObject target)
+        {
+            Target = target;
+        }
+    }
+
 }

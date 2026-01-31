@@ -45,6 +45,12 @@ namespace Trigger
                 case TriggerEventType.Infect:
                     HandleInfected(evt);
                     break;
+                case TriggerEventType.Drag:
+                    HandleDrag(evt);
+                    break;
+                case TriggerEventType.StopDrag:
+                    HandleStopDrag(evt);
+                    break;
                 default:
                     Debug.LogWarning($"Unhandled TriggerEventType: {evt.EventType}");
                     break;
@@ -58,6 +64,7 @@ namespace Trigger
         {
             if (evt.Phase != TriggerPhase.Enter)
                 return;
+            
             GameEvent.GameEvent.Publish(new InfectedEvent(evt.TriggeredObject));
 
         }
@@ -67,6 +74,22 @@ namespace Trigger
                 return;
 
             GameEvent.GameEvent.Publish(new EntityMaskedEvent(evt.TriggeredObject));
+        }
+        
+        private void HandleDrag(TriggerEvent evt)
+        {
+            if (evt.Phase != TriggerPhase.Stay)
+                return;
+
+            GameEvent.GameEvent.Publish(new EntityDragEvent(evt.Trigger.gameObject,evt.TriggeredObject));
+        }        
+        
+        private void HandleStopDrag(TriggerEvent evt)
+        {
+            if (evt.Phase != TriggerPhase.Stay)
+                return;
+
+            GameEvent.GameEvent.Publish(new EntityStopDragEvent(evt.TriggeredObject));
         }
         
         private void HandleFight(TriggerEvent evt)
