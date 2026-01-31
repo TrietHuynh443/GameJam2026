@@ -19,6 +19,8 @@ public class EndGameUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _normalText;
     [SerializeField] private TextMeshProUGUI _infectedText;
     [SerializeField] private TextMeshProUGUI _maskedText;
+    [SerializeField] private TextMeshProUGUI _scoreText;
+    
     private void Start()
     {
         _victory.SetActive(GameManager.IsWin);
@@ -67,5 +69,6 @@ public class EndGameUI : MonoBehaviour
         _normalText.text = res.Normal.ToString();
         _infectedText.text = res.Sick.ToString();
         _maskedText.text = res.Masked.ToString();
+        _scoreText.text = $"Score: {(int)(GameManager.Result * 100)}";
     }
 }

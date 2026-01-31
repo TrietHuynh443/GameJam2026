@@ -75,6 +75,7 @@ namespace SceneManagement
             
             await UniTask.WhenAll(changeSceneTask, minTimeLoadTask);
 
+            if (sceneInstance.IsUnityNull()) return; 
             await Addressables.UnloadSceneAsync(sceneInstance);
         }
 

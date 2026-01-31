@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
-using Cysharp.Threading.Tasks;
 using Human;
 using UnityEngine;
 using PlayerResources;
@@ -23,14 +23,6 @@ public class GameManager : MonoBehaviour
 
     [Header("Waves")]
     private SpawnWave[] _waves;
-    
-    [Header("Levels (Mock Data)")]
-    [SerializeField] private SpawnWave[] level1Waves;
-    [SerializeField] private SpawnWave[] level2Waves;
-    [SerializeField] private SpawnWave[] level3Waves;
-    [SerializeField] private SpawnWave[] level4Waves;
-    [SerializeField] private SpawnWave[] level5Waves;
-
 
     [Header("Spawn Areas")]
     [SerializeField] private SpawnArea[] spawnAreas;
@@ -54,7 +46,6 @@ public class GameManager : MonoBehaviour
             poolSize,
             spawnContainer
         );
-
     }
     
 
@@ -62,20 +53,21 @@ public class GameManager : MonoBehaviour
     {
         _waves = GetCurrentLevelWaves();
 
-        _total = _waves.Sum(wave =>
-            wave.angryCount +
-            wave.normalCount +
-            wave.sickCount
+        _total = _waves.Sum(w =>
+            w.normalCount +
+            w.angryCount +
+            w.sickCount
         );
 
         _endTime = DateTime.UtcNow.AddSeconds(
-            _waves.Sum(wave => wave.delayAfterWave)
+            _waves.Sum(w => w.delayAfterWave)
         );
 
         Debug.Log($"Starting Level {CurrentLevel} with {_waves.Length} waves");
 
         StartCoroutine(SpawnWaves());
     }
+
 
     
 
@@ -85,16 +77,15 @@ public class GameManager : MonoBehaviour
     // ----------------------------
     private SpawnWave[] GetCurrentLevelWaves()
     {
-        return CurrentLevel switch
+        if (!LevelWaves.TryGetValue(CurrentLevel, out var waves))
         {
-            1 => level1Waves,
-            2 => level2Waves,
-            3 => level3Waves,
-            4 => level4Waves,
-            5 => level5Waves,
-            _ => level5Waves // clamp to last level
-        };
+            Debug.LogError($"[GameManager] No waves defined for level {CurrentLevel}");
+            return Array.Empty<SpawnWave>();
+        }
+
+        return waves;
     }
+
 
     private IEnumerator SpawnWaves()
     {
@@ -170,22 +161,111 @@ public class GameManager : MonoBehaviour
         if(CurrentLevel < MaxLevel)
             CurrentLevel++;
     }
-
     
-#if UNITY_EDITOR
-    private void OnDrawGizmosSelected()
+    private static readonly Dictionary<int, SpawnWave[]> LevelWaves = new Dictionary<int, SpawnWave[]>
     {
-        if (spawnAreas == null) return;
-
-        Gizmos.color = Color.green;
-
-        foreach (var area in spawnAreas)
         {
-            Vector2 center = (area.min + area.max) * 0.5f;
-            Vector2 size = area.max - area.min;
-            Gizmos.DrawWireCube(center, size);
-        }
-    }
-#endif
+            1, new[]
+            {
+                new SpawnWave
+                {
+                    normalCount = 2,
+                    angryCount = 0,
+                    sickCount = 0,
+                    spawnAreaIndices = new[] { 0 },
+                    delayAfterWave = 10f
+                },
+                new SpawnWave
+                {
+                    normalCount = 6,
+                    angryCount = 0,
+                    sickCount = 2,
+                    spawnAreaIndices = new[] { 0, 1 },
+                    delayAfterWave = 20f
+                }
+            }
+        },
 
+        {
+            2, new[]
+            {
+                new SpawnWave
+                {
+                    normalCount = 2,
+                    angryCount = 1,
+                    sickCount = 0,
+                    spawnAreaIndices = new[] { 2 },
+                    delayAfterWave = 12f
+                },
+                new SpawnWave
+                {
+                    normalCount = 5,
+                    angryCount = 2,
+                    sickCount = 1,
+                    spawnAreaIndices = new[] { 0 },
+                    delayAfterWave = 22f
+                },
+                new SpawnWave
+                {
+                    normalCount = 4,
+                    angryCount = 3,
+                    sickCount = 1,
+                    spawnAreaIndices = new[] { 2 },
+                    delayAfterWave = 25f
+                }
+            }
+        },
+
+        {
+            3, new[]
+            {
+                new SpawnWave
+                {
+                    normalCount = 3,
+                    angryCount = 0,
+                    sickCount = 0,
+                    spawnAreaIndices = new[] { 1 },
+                    delayAfterWave = 10f
+                },
+                new SpawnWave
+                {
+                    normalCount = 6,
+                    angryCount = 1,
+                    sickCount = 1,
+                    spawnAreaIndices = new[] { 1 },
+                    delayAfterWave = 20f
+                },
+                new SpawnWave
+                {
+                    normalCount = 9,
+                    angryCount = 2,
+                    sickCount = 2,
+                    spawnAreaIndices = new[] { 1 },
+                    delayAfterWave = 30f
+                }
+            }
+        },
+
+        {
+            4, new[]
+            {
+                new SpawnWave { normalCount = 5, angryCount = 0, sickCount = 1, spawnAreaIndices = new[] { 0 }, delayAfterWave = 15f },
+                new SpawnWave { normalCount = 5, angryCount = 0, sickCount = 1, spawnAreaIndices = new[] { 1 }, delayAfterWave = 15f },
+                new SpawnWave { normalCount = 5, angryCount = 0, sickCount = 1, spawnAreaIndices = new[] { 2 }, delayAfterWave = 15f },
+                new SpawnWave { normalCount = 5, angryCount = 0, sickCount = 1, spawnAreaIndices = new[] { 3 }, delayAfterWave = 15f }
+            }
+        },
+
+        {
+            5, new[]
+            {
+                new SpawnWave { normalCount = 0, angryCount = 7, sickCount = 1, spawnAreaIndices = new[] { 0, 1 }, delayAfterWave = 15f },
+                new SpawnWave { normalCount = 1, angryCount = 6, sickCount = 1, spawnAreaIndices = new[] { 1, 2 }, delayAfterWave = 18f },
+                new SpawnWave { normalCount = 2, angryCount = 5, sickCount = 1, spawnAreaIndices = new[] { 2, 3 }, delayAfterWave = 20f },
+                new SpawnWave { normalCount = 3, angryCount = 4, sickCount = 1, spawnAreaIndices = new[] { 0, 2 }, delayAfterWave = 22f },
+                new SpawnWave { normalCount = 4, angryCount = 3, sickCount = 1, spawnAreaIndices = new[] { 1, 3 }, delayAfterWave = 25f }
+            }
+        }
+    };
 }
+

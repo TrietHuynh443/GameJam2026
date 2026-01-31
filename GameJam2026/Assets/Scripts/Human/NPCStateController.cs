@@ -25,7 +25,7 @@ namespace Human
 
     public class NPCStateController : MonoBehaviour
     {
-        public int isMasked = 0;
+        public int isMasked;
         public bool isBeingDragged = false;
         private Transform _dragSource;
 
@@ -76,7 +76,7 @@ namespace Human
         private bool _isMovingAfterCure;
         
         [Header("Dead Timer")]
-        [SerializeField] private float deadDuration = 45f;
+        [SerializeField] private float deadDuration = 120f;
 
         private float _deadTimer;
         private bool _isDeadCounting;
@@ -135,15 +135,18 @@ namespace Human
         private void OnMasked(EntityMaskedEvent evt)
         {
             if (evt.HumanNormal.transform.parent?.gameObject != gameObject 
-                || currentState == HumanState.Sick
+                || _current is SickHuman
                 || isMasked > 0)
                 return;
 
-            if (currentState is HumanState.Angry)
+            if (_current is HumanAngry)
                 _angryHuman.Fight(evt);
             else
             {
-                isMasked += 25;
+                lock (_lock)
+                {
+                    isMasked += 25;
+                }
                 SetBubble(BubbleState.Masked);
                 SoundManager.Instance.PlaySoundEffect(SoundEffectType.Masked);
                 GameEvent.GameEvent.Publish(new ScoreEvent(0, 1, 0));
@@ -151,27 +154,27 @@ namespace Human
             }
         }
 
-
+        private readonly object _lock = new ();
         private void OnInfected(InfectedEvent obj)
         {
             if(obj.Human.transform.parent?.gameObject != gameObject || _current is SickHuman) 
                 return;
-
-            if (isMasked > 0)
+            lock (_lock)
             {
-                isMasked -= 1;
-                if (isMasked == 0) 
-                    GameEvent.GameEvent.Publish<ScoreEvent>(new ScoreEvent(0, -1, 0));
+                if (isMasked > 0)
+                {
+                    isMasked -= 1;
+                    if (isMasked == 0) 
+                        GameEvent.GameEvent.Publish<ScoreEvent>(new ScoreEvent(0, -1, 0));
+                }
+                else
+                {
+                    GameEvent.GameEvent.Publish<ScoreEvent>(new ScoreEvent(1, 0, -1));
+                    SetState(HumanState.Sick);
+                    StartCoroutine(WaitAndTurn());
+                    SetBubble(BubbleState.Sick);
+                }
             }
-            else
-            {
-                GameEvent.GameEvent.Publish<ScoreEvent>(new ScoreEvent(1, 0, -1));
-                SetState(HumanState.Sick);
-                StartCoroutine(WaitAndTurn());
-                SetBubble(BubbleState.Sick);
-            }
-            
-
         }
 
         private void OnDrag(EntityDragEvent evt)
@@ -310,8 +313,6 @@ namespace Human
                     _isDeadCounting = false;
                     break;
 
-
-
                 case HumanState.Angry:
                     _current = _angryHuman;
                     SetBubble(BubbleState.Angry);
@@ -333,12 +334,12 @@ namespace Human
             sick.SetActive(state == HumanState.Sick);
         }
         
-        private void Update()
+        private void Dead()
         {
-            if (!_isDeadCounting || currentState != HumanState.Sick)
+            if (!_isDeadCounting || _current is not SickHuman)
                 return;
 
-            _deadTimer += Time.deltaTime;
+            _deadTimer += Time.fixedDeltaTime;
 
             float t = Mathf.Clamp01(_deadTimer / deadDuration);
 
@@ -356,9 +357,10 @@ namespace Human
 
         private void FixedUpdate()
         {
+            Dead();
             _maskedObject.SetActive(isMasked > 0);
-            _auraObject.SetActive(currentState is HumanState.Sick);
-            _angryObject.SetActive(currentState is HumanState.Angry);
+            _auraObject.SetActive(_current is SickHuman);
+            _angryObject.SetActive(_current is HumanAngry);
 
             if (_isMovingAfterCure)
                 return;
