@@ -31,7 +31,6 @@ namespace Human
             }
             
             Debug.Log("Infected ");
-            _controller.SetState(HumanState.Sick);
         }
 
         public void Masked()

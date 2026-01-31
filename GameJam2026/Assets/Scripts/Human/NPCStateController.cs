@@ -113,8 +113,9 @@ namespace Human
 
         private void OnInfected(InfectedEvent obj)
         {
-            if(obj.Human.transform.parent?.gameObject != gameObject) 
+            if(obj.Human.transform.parent?.gameObject != gameObject || _current is SickHuman) 
                 return;
+            
             if (isMasked)
             {
                 isMasked = false;
@@ -124,9 +125,8 @@ namespace Human
             {
                 GameEvent.GameEvent.Publish<ScoreEvent>(new ScoreEvent(1, 0, 0));
             }
-
-            _normalHuman.Infected();
-            _angryHuman.Infected();
+            
+            SetState(HumanState.Sick);
             
             SetBubble(BubbleState.Sick);
             
