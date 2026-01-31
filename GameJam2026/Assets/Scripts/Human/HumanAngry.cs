@@ -18,6 +18,7 @@ namespace Human
         
         [SerializeField] private Animator _animator;
         [SerializeField] private Animator _animatorMask;
+        [SerializeField] private Animator _angryAnimator;
         
         [Header("Block Mask Params")]
         public float angryDuration = 5f;
@@ -38,17 +39,14 @@ namespace Human
         {
             if (_controller.isMasked)
             {
-                _controller.isMasked = false;
                 return;
             }
             
             _controller.SetState(HumanState.Sick);
-            
         }
 
         public void Masked()
         {
-            _controller.isMasked = true;
         }
 
         public void RotateAround()
@@ -113,6 +111,7 @@ namespace Human
             {
                 Debug.Log($"{name} already 😡 wear a mask but your insist make him throw it away");
                 _controller.isMasked = false;
+                GameEvent.GameEvent.Publish(new ScoreEvent(0, -1, 0));
                 return;
             }
 
@@ -137,6 +136,9 @@ namespace Human
                 _animator.Play(animationName);
                 if (_animatorMask.gameObject.activeSelf)
                     _animatorMask.Play(animationName);
+                
+                if (_angryAnimator.gameObject.activeSelf)
+                    _angryAnimator.Play(animationName);
             }
         }
     }

@@ -10,13 +10,15 @@ namespace GameEvent.Events
     
     public struct ScoreEvent : IEvent
     {
+        public int Normal;
         public int Infected;
         public int Masked;
 
-        public ScoreEvent(int infected, int masked)
+        public ScoreEvent(int infected, int masked, int normal)
         {
             Infected = infected;
             Masked = masked;
+            Normal = normal;
         }
     }
 

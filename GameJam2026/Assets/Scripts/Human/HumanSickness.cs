@@ -97,11 +97,8 @@ namespace Human
 
         public void Cured()
         {
-            _controller.isMasked = true;
-            Debug.Log("I received a bonus mask!");
-            GameEvent.GameEvent.Publish(new ScoreEvent(0, 1));
+            GameEvent.GameEvent.Publish<ScoreEvent>(new ScoreEvent(-1, 0, 1));
             _controller.SetState(HumanState.Normal);
-
         }
 
         public void RotateAround()

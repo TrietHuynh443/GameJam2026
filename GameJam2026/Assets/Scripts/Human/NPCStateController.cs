@@ -1,7 +1,9 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using GameEvent.Events;
 using Sound;
+using UnityEditor.Animations;
 using UnityEngine;
 
 namespace Human
@@ -34,6 +36,9 @@ namespace Human
 
         [Header("Sprite")]
         [SerializeField] private SpriteRenderer spriteRenderer;
+        
+        [Header("Skins")]
+        [SerializeField] private List<AnimatorController> skinControllers;
 
         [Header("State Sprites")]
         [SerializeField] private Sprite normalSprite; // Tilesets_91
@@ -54,6 +59,7 @@ namespace Human
         [SerializeField] private GameObject _sickIcon;
         
         [SerializeField] private GameObject _feverObject;
+        [SerializeField] private GameObject _angryObject;
         
         private bool _isWaiting = false;
         [SerializeField] private GameObject _maskedObject;
@@ -92,6 +98,19 @@ namespace Human
             GameEvent.GameEvent.Subscribe<EntityStopDragEvent>(OnStopDrag);
             GameEvent.GameEvent.Subscribe<EntityCureEvent>(OnCure);
         }
+        
+        private void Awake()
+        {
+            if (!_animator) return;
+            if (skinControllers == null || skinControllers.Count == 0)
+            {
+                Debug.LogWarning("No skin controllers assigned.");
+                return;
+            }
+
+            int randomIndex = Random.Range(0, skinControllers.Count);
+            _animator.runtimeAnimatorController = skinControllers[randomIndex];
+        }
 
 
         private void Start()
@@ -101,17 +120,19 @@ namespace Human
 
         private void OnMasked(EntityMaskedEvent evt)
         {
-            if (evt.HumanNormal.transform.parent?.gameObject != gameObject || currentState == HumanState.Sick)
+            if (evt.HumanNormal.transform.parent?.gameObject != gameObject 
+                || currentState == HumanState.Sick
+                || isMasked)
                 return;
 
             if (currentState is HumanState.Angry)
                 _angryHuman.Fight(evt);
             else
             {
-                _normalHuman.Masked();
-                _angryHuman.Masked();
+                isMasked = true;
                 SetBubble(BubbleState.Masked);
                 SoundManager.Instance.PlaySoundEffect(SoundEffectType.Masked);
+                GameEvent.GameEvent.Publish(new ScoreEvent(0, 1, 0));
                 StartCoroutine(WaitAndTurn());
             }
         }
@@ -119,11 +140,21 @@ namespace Human
 
         private void OnInfected(InfectedEvent obj)
         {
-            if(obj.Human.transform.parent?.gameObject != gameObject || isImmune) 
+            if(obj.Human.transform.parent?.gameObject != gameObject || _current is SickHuman || isImmune) 
                 return;
             
-            _normalHuman.Infected();
-            _angryHuman.Infected();
+            if (isMasked)
+            {
+                isMasked = false;
+                GameEvent.GameEvent.Publish<ScoreEvent>(new ScoreEvent(0, -1, 0));
+            }
+            else
+            {
+                GameEvent.GameEvent.Publish<ScoreEvent>(new ScoreEvent(1, 0, 0));
+            }
+            
+            SetState(HumanState.Sick);
+            
             SetBubble(BubbleState.Sick);
             
             StartCoroutine(WaitAndTurn());
@@ -266,6 +297,7 @@ namespace Human
         {
             _maskedObject.SetActive(isMasked);
             _feverObject.SetActive(currentState is HumanState.Sick);
+            _angryObject.SetActive(currentState is HumanState.Angry);
 
             if (_isMovingAfterCure)
                 return;
@@ -288,7 +320,6 @@ namespace Human
 
             _current.Move();
         }
-
 
 
         public bool CheckObstacle(Vector2 dir)

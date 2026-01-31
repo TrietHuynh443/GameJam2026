@@ -5,6 +5,7 @@ using PlayerResources;
 using GameEvent.Events;
 using GameData;
 
+
 public class GameManager : MonoBehaviour
 {
     [Header("NPC Pool")]
@@ -21,7 +22,6 @@ public class GameManager : MonoBehaviour
 
     private ObjectPool<NPCStateController> _npcPool;
     private PlayerScore _score;
-    public float score;
 
     private void Awake()
     {
@@ -33,16 +33,7 @@ public class GameManager : MonoBehaviour
 
         _score = new PlayerScore();
     }
-
-    private void OnEnable()
-    {
-        GameEvent.GameEvent.Subscribe<ScoreEvent>(OnScoreEvent);
-    }
-
-    private void OnDisable()
-    {
-        GameEvent.GameEvent.Unsubscribe<ScoreEvent>(OnScoreEvent);
-    }
+    
 
     private void Start()
     {
@@ -74,6 +65,13 @@ public class GameManager : MonoBehaviour
                 wave.sickCount
             );
 
+            GameEvent.GameEvent.Publish<ScoreEvent>(new ScoreEvent()
+            {
+                Masked = 0,
+                Normal = wave.normalCount + wave.angryCount,
+                Infected = wave.sickCount
+            });
+
             yield return new WaitForSeconds(wave.delayAfterWave);
         }
     }
@@ -100,18 +98,7 @@ public class GameManager : MonoBehaviour
         int index = areaIndices[Random.Range(0, areaIndices.Length)];
         return spawnAreas[Mathf.Clamp(index, 0, spawnAreas.Length - 1)];
     }
-
-
-    private void OnScoreEvent(ScoreEvent evt)
-    {
-        if (evt.Masked != 0)
-            _score.UpdateResource(PlayerResourceChangeReason.Masked, evt.Masked);
-
-        if (evt.Infected != 0)
-            _score.UpdateResource(PlayerResourceChangeReason.Infected, evt.Infected);
-
-        score = _score.Amount;
-    }
+    
     
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected()

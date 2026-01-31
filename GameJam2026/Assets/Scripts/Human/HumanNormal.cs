@@ -26,20 +26,15 @@ namespace Human
         {
             if (_controller.isMasked)
             {
-                _controller.isMasked = false;
                 Debug.Log("My mask effect wear off!");
-                GameEvent.GameEvent.Publish(new ScoreEvent(0, -1));
                 return;
             }
             
             Debug.Log("Infected ");
-            gameObject.SetActive(false);
-            GameEvent.GameEvent.Publish(new ScoreEvent(1, 0));
         }
 
         public void Masked()
         {
-            _controller.isMasked = true;
         }
 
         public void RotateAround()
@@ -100,24 +95,6 @@ namespace Human
 
             return dir;
         }
-        private void WearMask(EntityMaskedEvent evt)
-        {
-            if (evt.HumanNormal != gameObject)
-            {
-                return;
-            }
-        
-            if (_controller.isMasked)
-            {
-                Debug.Log("I already wear a mask!");
-                return;
-            }
-        
-            _controller.isMasked = true;
-            Debug.Log("I wear a mask!");
-            GameEvent.GameEvent.Publish(new ScoreEvent(0, 1));
-        }
-
         public void Back()
         {
             
