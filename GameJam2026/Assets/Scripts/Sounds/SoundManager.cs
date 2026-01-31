@@ -11,6 +11,8 @@ namespace Sound
     public enum SoundEffectType
     {
         [SerializeAs("Masked")] Masked,
+        [SerializeAs("Angry")] Angry,
+        [SerializeAs("Click")] Click
     }
     public class SoundManager : PersistentMonoSingleton<SoundManager>
     {
@@ -21,7 +23,9 @@ namespace Sound
         private AudioClip[] _themeClips;
 
         private AudioClip _maskedSfx;
-    
+        private AudioClip _angrySfx;
+        private AudioClip _clickSfx;
+
         protected override void OnInitialized()
         {
             base.OnInitialized();
@@ -33,11 +37,13 @@ namespace Sound
                 Resources.Load<AudioClip>(ThemeSongSourceFast),
             };
             _maskedSfx = Resources.Load<AudioClip>("SE/Masked");
+            _angrySfx = Resources.Load<AudioClip>("SE/Angry");
+            _clickSfx = Resources.Load<AudioClip>("SE/Click");
         }
 
         private void Start()
         {
-            _audioSources["Music"].clip = _themeClips[1];
+            _audioSources["Music"].clip = _themeClips[0];
             _audioSources["Music"].Play();
         }
 
@@ -54,8 +60,25 @@ namespace Sound
         
         public void PlaySoundEffect(SoundEffectType se)
         {
-            _audioSources["SE"].clip = _maskedSfx;
+            var clip = GetClip(se);
+            if(!clip) return;
+            _audioSources["SE"].clip = clip;
             _audioSources["SE"].Play();
+        }
+
+        private AudioClip GetClip(SoundEffectType se)
+        {
+            switch (se)
+            {
+                case SoundEffectType.Masked:
+                    return _maskedSfx;
+                case SoundEffectType.Angry:
+                    return _angrySfx;
+                case SoundEffectType.Click:
+                    return _clickSfx;
+            }
+
+            return null;
         }
     }
 

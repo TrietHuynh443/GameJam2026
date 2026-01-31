@@ -18,6 +18,7 @@ namespace Human
         [SerializeField] private NPCStateController _controller;
         
         [SerializeField] private Animator _animator;
+        [SerializeField] private Animator _animatorMask;
         
         [Header("Block Mask Params")]
         public float angryDuration = 5f;
@@ -135,6 +136,7 @@ namespace Human
             if (!_animator.GetCurrentAnimatorStateInfo(0).IsName(animationName))
             {
                 _animator.Play(animationName);
+                _animatorMask.Play(animationName);
             }
         }
     }
