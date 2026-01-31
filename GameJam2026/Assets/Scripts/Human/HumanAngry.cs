@@ -20,6 +20,8 @@ namespace Human
         private SickHuman _sickHuman;
         private HumanNormal _normalHuman;
         
+        [SerializeField] private Animator _animator;
+        
         [Header("Block Mask Params")]
         public float angryDuration = 5f;
         
@@ -68,6 +70,7 @@ namespace Human
             if (_timer >= changeDirectionTime)
             {
                 _moveDirection = GetDirection();
+                PlayAnimation(_moveDirection);
                 _timer = 0f;
             }
 
@@ -77,6 +80,7 @@ namespace Human
                 nextPos.y < minBounds.y || nextPos.y > maxBounds.y)
             {
                 _moveDirection = GetDirection();
+                PlayAnimation(_moveDirection);
                 return;
             }
 
@@ -121,6 +125,15 @@ namespace Human
             _normalHuman.gameObject.SetActive(true);
             _normalHuman.isMasked = isMasked;
             gameObject.SetActive(false);
+        }
+        
+        private void PlayAnimation(HumanDirectionType direction)
+        {
+            string animationName = HumanDirectionExtension.DirectionNameMap[direction];
+            if (!_animator.GetCurrentAnimatorStateInfo(0).IsName(animationName))
+            {
+                _animator.Play(animationName);
+            }
         }
     }
 }

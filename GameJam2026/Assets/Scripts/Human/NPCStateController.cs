@@ -33,15 +33,15 @@ namespace Human
             switch (state)
             {
                 case HumanState.Normal:
-                    spriteRenderer.sprite = normalSprite;
+                    // spriteRenderer.sprite = normalSprite;
                     break;
 
                 case HumanState.Angry:
-                    spriteRenderer.sprite = angrySprite;
+                    // spriteRenderer.sprite = angrySprite;
                     break;
 
                 case HumanState.Sick:
-                    spriteRenderer.sprite = sickSprite;
+                    // spriteRenderer.sprite = sickSprite;
                     break;
             }
         }

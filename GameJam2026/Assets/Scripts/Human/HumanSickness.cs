@@ -17,6 +17,8 @@ namespace Human
         
         [SerializeField] private Transform _transform;
         
+        [SerializeField] private Animator _animator;
+        
         private void OnEnable()
         {
             gameObject.layer = LayerMask.NameToLayer("SickHuman");
@@ -33,6 +35,7 @@ namespace Human
             }
 
             _direction = GetDirection();
+            PlayAnimation(_direction);
             _startTime = impactTime;
             _transform.DOMove(_transform.position + (Vector3)HumanDirectionExtension.DirectionMap[_direction], MoveDeltaTime);
         }
@@ -51,6 +54,15 @@ namespace Human
         public void Back()
         {
             _isFaceWall = true;
+        }
+        
+        private void PlayAnimation(HumanDirectionType direction)
+        {
+            string animationName = HumanDirectionExtension.DirectionNameMap[direction];
+            if (!_animator.GetCurrentAnimatorStateInfo(0).IsName(animationName))
+            {
+                _animator.Play(animationName);
+            }
         }
     }
 }

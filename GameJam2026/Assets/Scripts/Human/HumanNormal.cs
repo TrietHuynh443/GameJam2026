@@ -25,6 +25,8 @@ namespace Human
         [SerializeField] private Transform _transform;
         private SickHuman _sickHuman;
         private HumanAngry _angryHuman;
+        
+        [SerializeField] private Animator _animator;
 
         private void Start()
         {
@@ -74,6 +76,7 @@ namespace Human
             if (_timer >= changeDirectionTime)
             {
                 _moveDirection = GetDirection();
+                PlayAnimation(_moveDirection);
                 _timer = 0f;
             }
 
@@ -83,6 +86,7 @@ namespace Human
                 nextPos.y < minBounds.y || nextPos.y > maxBounds.y)
             {
                 _moveDirection = GetDirection();
+                PlayAnimation(_moveDirection);
                 return;
             }
 
@@ -143,6 +147,15 @@ namespace Human
             _angryHuman.gameObject.SetActive(true);
             _angryHuman.isMasked = isMasked;
             gameObject.SetActive(false);
+        }
+        
+        private void PlayAnimation(HumanDirectionType direction)
+        {
+            string animationName = HumanDirectionExtension.DirectionNameMap[direction];
+            if (!_animator.GetCurrentAnimatorStateInfo(0).IsName(animationName))
+            {
+                _animator.Play(animationName);
+            }
         }
     }
     
