@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using Cysharp.Threading.Tasks;
-using DG.Tweening;
 using GameEvent.Events;
+using Sound;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace Human
 {
@@ -79,7 +77,7 @@ namespace Human
                 _normalHuman.Masked();
                 _angryHuman.Masked();
                 SetBubble(BubbleState.Masked);
-                
+                SoundManager.Instance.PlaySoundEffect(SoundEffectType.Masked);
                 StartCoroutine(WaitAndTurn());
             }
         }
@@ -140,8 +138,12 @@ namespace Human
         }
 
         private bool _isWaiting = false;
+        [SerializeField] private GameObject _maskedObject;
+
         private void FixedUpdate()
         {
+            _maskedObject.SetActive(isMasked);
+            
             if (_isWaiting)
             {
                 _current.RotateAround();

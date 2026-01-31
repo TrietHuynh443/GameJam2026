@@ -29,6 +29,7 @@ namespace Human
             gameObject.layer = LayerMask.NameToLayer("NPC");
             triggerType = TriggerEventType.Infect;
             _startTime = int.MinValue;
+            _controller.isMasked = false;
         }
 
         public void Move()
