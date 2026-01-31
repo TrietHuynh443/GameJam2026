@@ -16,6 +16,8 @@ public class IslandButton : MonoBehaviour
     [SerializeField] private GameObject hovered;
     [SerializeField] private GameObject clicked;
     
+    [SerializeField] private GameObject tutorial;
+    
     private State currentState = State.Normal;
     private bool isMouseOver = false;
     
@@ -34,6 +36,9 @@ public class IslandButton : MonoBehaviour
 
     private void OnMouseDown()
     {
+        if (tutorial.activeSelf)
+            return;
+        
         ShowState(State.Clicked);
         SoundManager.Instance.PlaySoundEffect(SoundEffectType.Click);
         StartCoroutine(ResetClickState());
