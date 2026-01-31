@@ -29,12 +29,10 @@ namespace Human
         {
             StopAllCoroutines();
             StartCoroutine(CalmDownAfterTime());
-            GameEvent.GameEvent.Subscribe<EntityFightEvent>(Fight);
         }
 
         private void OnDisable()
         {
-            GameEvent.GameEvent.Unsubscribe<EntityFightEvent>(Fight);
         }
         public void Infected()
         {
@@ -106,9 +104,9 @@ namespace Human
             _isFaceWall = true;
         }
         
-        private void Fight(EntityFightEvent evt)
+        public void Fight(EntityMaskedEvent evt)
         {
-            if (evt.HumanAngry != gameObject)
+            if (evt.HumanNormal != gameObject)
                 return;
 
             if (_controller.isMasked)

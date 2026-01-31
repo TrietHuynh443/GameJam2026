@@ -68,14 +68,19 @@ namespace Human
 
         private void OnMasked(EntityMaskedEvent evt)
         {
-            if (evt.HumanNormal.transform.parent?.gameObject != gameObject)
+            if (evt.HumanNormal.transform.parent?.gameObject != gameObject || currentState == HumanState.Sick)
                 return;
 
             if (currentState is HumanState.Angry)
-                return;
-            
-            _normalHuman.Masked();
-            _angryHuman.Masked();
+                _angryHuman.Fight(evt);
+            else
+            {
+                _normalHuman.Masked();
+                _angryHuman.Masked();
+                SetBubble(BubbleState.Masked);
+                
+                StartCoroutine(WaitAndTurn());
+            }
         }
 
 
@@ -86,7 +91,10 @@ namespace Human
             
             _normalHuman.Infected();
             _angryHuman.Infected();
-            SetBubble(BubbleState.Masked);
+            SetBubble(BubbleState.Sick);
+            
+            StartCoroutine(WaitAndTurn());
+
         }
 
         private void SetBubble(BubbleState state)
@@ -121,12 +129,9 @@ namespace Human
                     break;
 
                 case HumanState.Sick:
-                    SetBubble(BubbleState.Sick);
                     _current = _sickHuman;
                     break;
             }
-            
-            
 
             normal.SetActive(state == HumanState.Normal);
             angry.SetActive(state == HumanState.Angry);
