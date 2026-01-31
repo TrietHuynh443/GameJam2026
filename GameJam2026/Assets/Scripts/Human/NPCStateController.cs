@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using GameEvent.Events;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -10,6 +11,13 @@ namespace Human
     public enum HumanState
     {
         Normal,
+        Angry,
+        Sick
+    }
+    
+    public enum BubbleState
+    {
+        Masked,
         Angry,
         Sick
     }
@@ -35,6 +43,11 @@ namespace Human
         [SerializeField] private HumanState _initState = HumanState.Normal;
         [SerializeField] private Animator _animator;
         
+
+        [SerializeField] private GameObject _bubble;
+        [SerializeField] private GameObject _angryIcon;
+        [SerializeField] private GameObject _maskedIcon;
+        [SerializeField] private GameObject _sickIcon;
         private IHuman _current;
         private void OnEnable()
         {
@@ -44,6 +57,12 @@ namespace Human
             }
             GameEvent.GameEvent.Subscribe<InfectedEvent>(OnInfected);
             GameEvent.GameEvent.Subscribe<EntityMaskedEvent>(OnMasked);
+        }
+
+
+        private void Start()
+        {
+            SetState(HumanState.Sick);
         }
 
         private void OnMasked(EntityMaskedEvent obj)
@@ -59,7 +78,19 @@ namespace Human
             
             _normalHuman.Infected();
             _angryHuman.Infected();
+            SetBubble(BubbleState.Masked);
         }
+
+        private void SetBubble(BubbleState state)
+        {
+            _angryIcon.SetActive(state == BubbleState.Angry);
+            _maskedIcon.SetActive(state == BubbleState.Masked);
+            _sickIcon.SetActive(state == BubbleState.Sick);
+            _bubble.SetActive(true);
+            UniTask.WaitForSeconds(1f).ContinueWith(() => _bubble.SetActive(false));
+        }
+        
+        
 
         private void OnDisable()
         {
@@ -79,12 +110,16 @@ namespace Human
                 case HumanState.Angry:
                     _angryHuman.isMasked = _normalHuman.isMasked;
                     _current = _angryHuman;
+                    SetBubble(BubbleState.Angry);
                     break;
 
                 case HumanState.Sick:
+                    SetBubble(BubbleState.Sick);
                     _current = _sickHuman;
                     break;
             }
+            
+            
 
             normal.SetActive(state == HumanState.Normal);
             angry.SetActive(state == HumanState.Angry);
