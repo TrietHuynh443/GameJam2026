@@ -13,7 +13,8 @@ namespace SceneManagement
     public enum EScene
     {
         [SerializeAs("SampleScene")] SampleScene = 0,
-        [SerializeAs("Main Scene")] MainScene = 1
+        [SerializeAs("Main")] MainScene = 1,
+        [SerializeAs("Start")] Start = 2,
     }
     public class SceneLoader : PersistentMonoSingleton<SceneLoader>
     {
@@ -58,7 +59,7 @@ namespace SceneManagement
 
         private void Start()
         {
-            ChangeScene(EScene.MainScene).Forget();
+            ChangeScene(EScene.Start).Forget();
         }
 
         public async UniTaskVoid ChangeScene(EScene scene, Action onComplete = null)
