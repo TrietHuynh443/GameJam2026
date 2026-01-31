@@ -57,7 +57,7 @@ namespace Human
         [SerializeField] private GameObject _maskedIcon;
         [SerializeField] private GameObject _sickIcon;
         
-        [SerializeField] private GameObject _feverObject;
+        [SerializeField] private GameObject _auraObject;
         [SerializeField] private GameObject _angryObject;
         
         private bool _isWaiting = false;
@@ -283,6 +283,7 @@ namespace Human
 
                 case HumanState.Sick:
                     _current = _sickHuman;
+                    _auraObject.GetComponent<SpriteRenderer>().color = new Color32(119, 106, 162, 147); //Fever color
                     break;
             }
 
@@ -295,7 +296,7 @@ namespace Human
         private void FixedUpdate()
         {
             _maskedObject.SetActive(isMasked);
-            _feverObject.SetActive(currentState is HumanState.Sick);
+            _auraObject.SetActive(currentState is HumanState.Sick);
             _angryObject.SetActive(currentState is HumanState.Angry);
 
             if (_isMovingAfterCure)
