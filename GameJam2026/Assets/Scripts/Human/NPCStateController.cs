@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using Cysharp.Threading.Tasks;
-using DG.Tweening;
 using GameEvent.Events;
-using Unity.VisualScripting;
+using Sound;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace Human
 {
@@ -54,6 +51,8 @@ namespace Human
         [SerializeField] private GameObject _angryIcon;
         [SerializeField] private GameObject _maskedIcon;
         [SerializeField] private GameObject _sickIcon;
+        
+        [SerializeField] private GameObject _feverObject;
         private IHuman _current;
         private void OnEnable()
         {
@@ -85,7 +84,7 @@ namespace Human
                 _normalHuman.Masked();
                 _angryHuman.Masked();
                 SetBubble(BubbleState.Masked);
-                
+                SoundManager.Instance.PlaySoundEffect(SoundEffectType.Masked);
                 StartCoroutine(WaitAndTurn());
             }
         }
@@ -101,7 +100,6 @@ namespace Human
             SetBubble(BubbleState.Sick);
             
             StartCoroutine(WaitAndTurn());
-
         }
 
         private void OnDrag(EntityDragEvent evt)
@@ -169,8 +167,12 @@ namespace Human
         }
 
         private bool _isWaiting = false;
+        [SerializeField] private GameObject _maskedObject;
+
         private void FixedUpdate()
         {
+            _maskedObject.SetActive(isMasked);
+            _feverObject.SetActive(currentState is HumanState.Sick);
             if (isBeingDragged && _dragSource != null)
             {
                 // Follow player
@@ -208,6 +210,8 @@ namespace Human
 
         private IEnumerator WaitAndTurn()
         {
+            if (_isWaiting) yield break;
+            
             float speed = _animator.speed;
             _isWaiting = true;
             _animator.speed = 0;

@@ -15,7 +15,8 @@ namespace Human
         [SerializeField] private Transform _transform;
 
         [SerializeField] private Animator _animator;
-        [SerializeField] private Animator _animatorMask;
+        [SerializeField] private Animator _feverAnimator;
+        
 
         private HumanDirectionType _avoidDir = HumanDirectionType.None;
         [SerializeField] private NPCStateController _controller;
@@ -25,7 +26,7 @@ namespace Human
         protected override void OnEnable()
         {
             gameObject.layer = LayerMask.NameToLayer("NPC");
-            
+            _controller.isMasked = false;
             base.OnEnable();
         }
 
@@ -81,7 +82,8 @@ namespace Human
             if (!_animator.GetCurrentAnimatorStateInfo(0).IsName(animationName))
             {
                 _animator.Play(animationName);
-                _animatorMask.Play(animationName);
+                if (_feverAnimator.gameObject.activeSelf)
+                    _feverAnimator.Play(animationName);
             }
         }
 
