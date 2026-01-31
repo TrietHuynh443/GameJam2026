@@ -33,6 +33,7 @@ namespace Human
         [SerializeField] private HumanNormal _normalHuman;
 
         [SerializeField] private HumanState _initState = HumanState.Normal;
+        [SerializeField] private Animator _animator;
         
         private IHuman _current;
         private void OnEnable()
@@ -118,8 +119,11 @@ namespace Human
 
         private IEnumerator WaitAndTurn()
         {
+            float speed = _animator.speed; 
             _isWaiting = true;
+            _animator.speed = 0;
             yield return new WaitForSeconds(1f);
+            _animator.speed = speed;
             _isWaiting = false;
         }
 

@@ -149,6 +149,7 @@ MonoBehaviour:
   _angryHuman: {fileID: 3999546297941022799}
   _normalHuman: {fileID: 945887827879879963}
   _initState: 0
+  _animator: {fileID: 4197065952167025250}
 --- !u!1001 &3036711341518755754
 PrefabInstance:
   m_ObjectHideFlags: 0

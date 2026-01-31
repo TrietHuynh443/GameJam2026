@@ -37,6 +37,7 @@ namespace Human
             if (_timer >= 2)
             {
                 _direction = GetDirection();
+                PlayAnimation(_direction);
                 _timer = 0f;
             }
             
@@ -44,11 +45,11 @@ namespace Human
             {
                 _avoidDir = _direction;
                 _direction = GetDirection();
+                PlayAnimation(_direction);
                 return;
             }
             Vector3 nextPos = transform.position + (Vector3)(HumanDirectionExtension.DirectionMap[_direction] * (0.5f * Time.fixedDeltaTime));
             
-            PlayAnimation(_direction);
             _transform.position = nextPos;
         }
 
