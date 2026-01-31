@@ -1,4 +1,6 @@
 using System.Collections;
+using SceneManagement;
+using Sound;
 using UnityEngine;
 
 public class IslandButton : MonoBehaviour
@@ -33,13 +35,14 @@ public class IslandButton : MonoBehaviour
     private void OnMouseDown()
     {
         ShowState(State.Clicked);
+        SoundManager.Instance.PlaySoundEffect(SoundEffectType.Click);
         StartCoroutine(ResetClickState());
     }
 
     private IEnumerator ResetClickState()
     {
         yield return new WaitForSeconds(0.3f);
-        ShowState(isMouseOver ? State.Hovered : State.Normal);
+        yield return SceneLoader.Instance.ChangeScene(EScene.MainScene);
     }
 
 

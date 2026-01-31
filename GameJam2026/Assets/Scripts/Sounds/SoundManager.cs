@@ -44,6 +44,7 @@ namespace Sound
         private void Start()
         {
             _audioSources["Music"].clip = _themeClips[0];
+            _audioSources["Music"].loop = true;
             _audioSources["Music"].Play();
         }
 
