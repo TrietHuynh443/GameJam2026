@@ -1,7 +1,9 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using GameEvent.Events;
 using Sound;
+using UnityEditor.Animations;
 using UnityEngine;
 
 namespace Human
@@ -33,6 +35,9 @@ namespace Human
 
         [Header("Sprite")]
         [SerializeField] private SpriteRenderer spriteRenderer;
+        
+        [Header("Skins")]
+        [SerializeField] private List<AnimatorController> skinControllers;
 
         [Header("State Sprites")]
         [SerializeField] private Sprite normalSprite; // Tilesets_91
@@ -64,6 +69,19 @@ namespace Human
             GameEvent.GameEvent.Subscribe<EntityMaskedEvent>(OnMasked);
             GameEvent.GameEvent.Subscribe<EntityDragEvent>(OnDrag);
             GameEvent.GameEvent.Subscribe<EntityStopDragEvent>(OnStopDrag);
+        }
+        
+        private void Awake()
+        {
+            if (!_animator) return;
+            if (skinControllers == null || skinControllers.Count == 0)
+            {
+                Debug.LogWarning("No skin controllers assigned.");
+                return;
+            }
+
+            int randomIndex = Random.Range(0, skinControllers.Count);
+            _animator.runtimeAnimatorController = skinControllers[randomIndex];
         }
 
 
