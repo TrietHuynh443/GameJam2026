@@ -136,7 +136,8 @@ namespace Human
             if (!_animator.GetCurrentAnimatorStateInfo(0).IsName(animationName))
             {
                 _animator.Play(animationName);
-                _animatorMask.Play(animationName);
+                if (_animatorMask.gameObject.activeSelf)
+                    _animatorMask.Play(animationName);
             }
         }
     }
