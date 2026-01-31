@@ -65,7 +65,7 @@ namespace Human
         [SerializeField] private GameObject _maskedObject;
         
         [Header("After Cure Movement")]
-        [SerializeField] private Transform[] curedDestinations;
+        [SerializeField] private Vector2 curedDestination;
         [SerializeField] private float moveToCuredSpeed = 2.5f;
         [SerializeField] private float fadeOutDuration = 0.5f;
 
@@ -350,33 +350,20 @@ namespace Human
             _isWaiting = false;
         }
         
-        private Transform GetRandomCuredDestination()
-        {
-            if (curedDestinations == null || curedDestinations.Length == 0)
-                return null;
-
-            return curedDestinations[Random.Range(0, curedDestinations.Length)];
-        }
-
-        
         private IEnumerator MoveAfterCure()
         {
-            Transform destination = GetRandomCuredDestination();
-            if (destination == null)
-            {
-                Debug.LogWarning("No cured destinations assigned", this);
-                yield break;
-            }
+            yield return new WaitUntil(() => isBeingDragged == false);
+
 
             _isMovingAfterCure = true;
 
             SetState(HumanState.Normal);
 
-            while (Vector2.Distance(transform.position, destination.position) > 0.1f)
+            while (Vector2.Distance(transform.position, curedDestination) > 0.1f)
             {
                 transform.position = Vector3.MoveTowards(
                     transform.position,
-                    destination.position,
+                    curedDestination,
                     moveToCuredSpeed * Time.deltaTime
                 );
 
@@ -385,6 +372,7 @@ namespace Human
 
             yield return FadeOutAndDisable();
         }
+
 
         public void ResetState()
         {

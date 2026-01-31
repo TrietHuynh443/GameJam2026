@@ -651,20 +651,17 @@ MonoBehaviour:
     delayAfterWave: 60
   spawnAreas:
   - id: 
-    min: {x: -14.9, y: -3.29}
-    max: {x: 16.26, y: -9.21}
+    min: {x: -15, y: -3.26}
+    max: {x: 16.1, y: -9.34}
+  - id: 
+    min: {x: -34.9, y: -2.77}
+    max: {x: -33.2, y: -33.2}
   - id: 
     min: {x: -13.2, y: -23.6}
-    max: {x: 16.26, y: -32.51}
+    max: {x: 16.26, y: -31}
   - id: 
-    min: {x: -13.2, y: -23.6}
-    max: {x: 16.26, y: -32.51}
-  - id: 
-    min: {x: -7.1, y: -3.4}
-    max: {x: 6.5, y: -32.51}
-  - id: 
-    min: {x: -35.4, y: -2.68}
-    max: {x: -32.7, y: -32.51}
+    min: {x: -6.76, y: -3.4}
+    max: {x: 6.5, y: -31.2}
   spawnContainer: {fileID: 1854661287}
 --- !u!213 &1469106345
 Sprite:
@@ -927,34 +924,6 @@ PrefabInstance:
       propertyPath: m_TileSpriteArray.Array.data[11].m_Data
       value: 
       objectReference: {fileID: 1469106345}
-    - target: {fileID: 2371596574734459678, guid: ed671aa81501249d09e5d2244083b339, type: 3}
-      propertyPath: m_TileSpriteArray.Array.data[14].m_Data
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2371596574734459678, guid: ed671aa81501249d09e5d2244083b339, type: 3}
-      propertyPath: m_TileSpriteArray.Array.data[30].m_Data
-      value: 
-      objectReference: {fileID: -2967380057133497924, guid: 541b091ff410d4c81a307d4478b3e885, type: 3}
-    - target: {fileID: 2371596574734459678, guid: ed671aa81501249d09e5d2244083b339, type: 3}
-      propertyPath: m_TileSpriteArray.Array.data[67].m_Data
-      value: 
-      objectReference: {fileID: -7906845895521911252, guid: 541b091ff410d4c81a307d4478b3e885, type: 3}
-    - target: {fileID: 2371596574734459678, guid: ed671aa81501249d09e5d2244083b339, type: 3}
-      propertyPath: m_TileSpriteArray.Array.data[14].m_RefCount
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2371596574734459678, guid: ed671aa81501249d09e5d2244083b339, type: 3}
-      propertyPath: m_TileSpriteArray.Array.data[67].m_RefCount
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2371596574734459678, guid: ed671aa81501249d09e5d2244083b339, type: 3}
-      propertyPath: m_Tiles.Array.data[268].second.m_TileSpriteIndex
-      value: 67
-      objectReference: {fileID: 0}
-    - target: {fileID: 2371596574734459678, guid: ed671aa81501249d09e5d2244083b339, type: 3}
-      propertyPath: m_Tiles.Array.data[1219].second.m_TileSpriteIndex
-      value: 30
-      objectReference: {fileID: 0}
     - target: {fileID: 4380106270775688894, guid: ed671aa81501249d09e5d2244083b339, type: 3}
       propertyPath: m_Name
       value: Map

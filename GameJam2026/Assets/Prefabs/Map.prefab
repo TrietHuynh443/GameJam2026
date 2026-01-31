@@ -3823,7 +3823,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 62
-      m_TileSpriteIndex: 30
+      m_TileSpriteIndex: 67
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -13333,7 +13333,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 12
-      m_TileSpriteIndex: 14
+      m_TileSpriteIndex: 30
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -27592,8 +27592,8 @@ Tilemap:
     m_Data: {fileID: 1796069897981596636, guid: 541b091ff410d4c81a307d4478b3e885, type: 3}
   - m_RefCount: 5
     m_Data: {fileID: 7616309345710383699, guid: 541b091ff410d4c81a307d4478b3e885, type: 3}
-  - m_RefCount: 1
-    m_Data: {fileID: -2967380057133497924, guid: 541b091ff410d4c81a307d4478b3e885, type: 3}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
   - m_RefCount: 35
     m_Data: {fileID: -5620848179171734369, guid: 541b091ff410d4c81a307d4478b3e885, type: 3}
   - m_RefCount: 108
@@ -27625,7 +27625,7 @@ Tilemap:
   - m_RefCount: 50
     m_Data: {fileID: 3953410629140032833, guid: 541b091ff410d4c81a307d4478b3e885, type: 3}
   - m_RefCount: 1
-    m_Data: {fileID: -7906845895521911252, guid: 541b091ff410d4c81a307d4478b3e885, type: 3}
+    m_Data: {fileID: -2967380057133497924, guid: 541b091ff410d4c81a307d4478b3e885, type: 3}
   - m_RefCount: 1
     m_Data: {fileID: -8982982597831718475, guid: 541b091ff410d4c81a307d4478b3e885, type: 3}
   - m_RefCount: 2
@@ -27698,8 +27698,8 @@ Tilemap:
     m_Data: {fileID: 6660175310054556048, guid: 541b091ff410d4c81a307d4478b3e885, type: 3}
   - m_RefCount: 1
     m_Data: {fileID: 5684586813073123786, guid: 541b091ff410d4c81a307d4478b3e885, type: 3}
-  - m_RefCount: 0
-    m_Data: {fileID: 0}
+  - m_RefCount: 1
+    m_Data: {fileID: -7906845895521911252, guid: 541b091ff410d4c81a307d4478b3e885, type: 3}
   - m_RefCount: 2
     m_Data: {fileID: 2619802806847087816, guid: 541b091ff410d4c81a307d4478b3e885, type: 3}
   - m_RefCount: 1
@@ -28112,7 +28112,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 2.5, y: -5.7}
+  m_Offset: {x: 2.5, y: -4.69}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -28721,13 +28721,49 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2543736256070315347, guid: 48728df34923e624dbb0f4e27e036d26, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 242768882461418228}
+    - targetCorrespondingSourceObject: {fileID: 2543736256070315347, guid: 48728df34923e624dbb0f4e27e036d26, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5256022016689701505}
   m_SourcePrefab: {fileID: 100100000, guid: 48728df34923e624dbb0f4e27e036d26, type: 3}
 --- !u!4 &4001275018547122702 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6303300425051145889, guid: 48728df34923e624dbb0f4e27e036d26, type: 3}
   m_PrefabInstance: {fileID: 6989217431031600303}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &4878412819730610684 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2543736256070315347, guid: 48728df34923e624dbb0f4e27e036d26, type: 3}
+  m_PrefabInstance: {fileID: 6989217431031600303}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &242768882461418228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4878412819730610684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b07cd86f86945f39ece5ea7f880d6d3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isAuto: 1
+--- !u!114 &5256022016689701505
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4878412819730610684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8033b7f4f8a041288399a11867cf9dcb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &7028388054724757248
 PrefabInstance:
   m_ObjectHideFlags: 0
