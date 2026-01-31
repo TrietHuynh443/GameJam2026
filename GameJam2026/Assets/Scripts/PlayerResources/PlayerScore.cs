@@ -5,32 +5,28 @@ namespace PlayerResources
     public class PlayerScore : PlayerResources
     {
         public override float Amount { get; protected set; }
-        public override float GrowRate { get; protected set; }
+        public override float GrowRate { get; protected set; } = 0f;
 
-        private int _masked;
-        private int _normal;
-        private int _sick;
-
-        public PlayerScore(float growRate = 1f)
-        {
-            GrowRate = growRate;
-        }
+        public int Masked;
+        public int Normal;
+        public int Sick;
+        
 
         public override void UpdateResource(PlayerResourceChangeReason reason, float amount)
         {
             switch (reason)
             {
                 case PlayerResourceChangeReason.Masked:
-                    _masked += (int)amount;
+                    Masked += (int)amount;
                     break;
 
                 case PlayerResourceChangeReason.Infected:
-                    _sick += (int)amount;
-                    _normal -= (int)amount;
+                    Sick += (int)amount;
+                    Normal -= (int)amount;
                     break;
 
                 case PlayerResourceChangeReason.Normal:
-                    _normal += (int)amount;
+                    Normal += (int)amount;
                     break;
             }
 
@@ -39,8 +35,8 @@ namespace PlayerResources
 
         private void Recalculate()
         {
-            if (_sick <= 0) _sick = 1; // prevent div by zero
-            Amount = _masked * _normal / (float)_sick;
+            if (Sick <= 0) Sick = 1; // prevent div by zero
+            Amount = Masked * Normal / (float)Sick;
         }
     }
 }
