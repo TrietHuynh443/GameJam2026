@@ -13,7 +13,6 @@ namespace Human
 
         private HumanDirectionType _moveDirection;
         private float _timer;
-        private bool _isFaceWall = false;
         [SerializeField] private Transform _transform;
         [SerializeField] private NPCStateController _controller;
         
@@ -102,7 +101,7 @@ namespace Human
 
         public void Back()
         {
-            _isFaceWall = true;
+            
         }
         
         public void Fight(EntityMaskedEvent evt)

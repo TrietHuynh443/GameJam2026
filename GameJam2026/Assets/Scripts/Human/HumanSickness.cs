@@ -11,10 +11,7 @@ namespace Human
         private float MoveDeltaTime => 1f / Speed;
         
         private HumanDirectionType _direction;
-        private float _startTime;
 
-        private bool _isFaceWall = false;
-        
         [SerializeField] private Transform _transform;
 
         [SerializeField] private Animator _animator;
@@ -29,7 +26,6 @@ namespace Human
         protected override void OnEnable()
         {
             gameObject.layer = LayerMask.NameToLayer("NPC");
-            _startTime = int.MinValue;
             _controller.isMasked = false;
             base.OnEnable();
         }
@@ -77,7 +73,7 @@ namespace Human
 
         public void Back()
         {
-            _isFaceWall = true;
+            
         }
         
         private void PlayAnimation(HumanDirectionType direction)
