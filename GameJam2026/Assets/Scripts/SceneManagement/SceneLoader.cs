@@ -15,6 +15,7 @@ namespace SceneManagement
         [SerializeAs("SampleScene")] SampleScene = 0,
         [SerializeAs("Main")] MainScene = 1,
         [SerializeAs("Start")] Start = 2,
+        [SerializeAs("End")] End = 3
     }
     public class SceneLoader : PersistentMonoSingleton<SceneLoader>
     {

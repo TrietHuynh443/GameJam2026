@@ -1,9 +1,15 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using System.Linq;
+using Cysharp.Threading.Tasks;
 using Human;
 using UnityEngine;
 using PlayerResources;
 using GameEvent.Events;
 using GameData;
+using SceneManagement;
+using TMPro;
+using Random = UnityEngine.Random;
 
 
 public class GameManager : MonoBehaviour
@@ -20,8 +26,14 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private Transform spawnContainer;
 
+    [SerializeField] private TextMeshProUGUI _timer;
+
+    [SerializeField] private TextMeshProUGUI _score;
+
+    private DateTime _endTime;
     private ObjectPool<NPCStateController> _npcPool;
-    private PlayerScore _score;
+    private int _total;
+    public static bool IsWin { get; set; } = false;
 
     private void Awake()
     {
@@ -31,14 +43,16 @@ public class GameManager : MonoBehaviour
             spawnContainer
         );
 
-        _score = new PlayerScore();
     }
     
 
     private void Start()
     {
+        _total = waves.Sum(wave => wave.angryCount + wave.normalCount + wave.sickCount);
+        _endTime = DateTime.UtcNow.AddSeconds(waves.Sum(wave => wave.delayAfterWave));
         StartCoroutine(SpawnWaves());
     }
+    
 
 
     // ----------------------------
@@ -54,16 +68,7 @@ public class GameManager : MonoBehaviour
             SpawnGroup(HumanState.Normal, wave.normalCount, wave.spawnAreaIndices);
             SpawnGroup(HumanState.Angry, wave.angryCount, wave.spawnAreaIndices);
             SpawnGroup(HumanState.Sick, wave.sickCount, wave.spawnAreaIndices);
-
-            _score.UpdateResource(
-                PlayerResourceChangeReason.Normal,
-                wave.normalCount + wave.angryCount
-            );
-
-            _score.UpdateResource(
-                PlayerResourceChangeReason.Infected,
-                wave.sickCount
-            );
+            
 
             GameEvent.GameEvent.Publish<ScoreEvent>(new ScoreEvent()
             {
@@ -74,8 +79,30 @@ public class GameManager : MonoBehaviour
 
             yield return new WaitForSeconds(wave.delayAfterWave);
         }
+        if (_total == 0)
+        {
+            GameManager.Result = 100;
+            GameManager.IsWin = true;
+        }
+        else
+        {
+            GameManager.Result = (float)PlayerResourcesManager.Instance.Get<PlayerScore>().Normal / _total;
+            GameManager.IsWin = GameManager.Result >= 0.5f;
+        }
+
+        SceneLoader.Instance.ChangeScene(EScene.End).Forget();
     }
 
+    public static float Result { get; set; }
+
+    private void FixedUpdate()
+    {
+        if(!_score || !_timer) return;
+        
+        _score.text = $"{PlayerResourcesManager.Instance.Get<PlayerScore>().Normal}/{_total}";
+        var span = (_endTime - DateTime.UtcNow);
+        _timer.text = $"{span.Minutes:00}:{span.Seconds:00}";
+    }
 
     private void SpawnGroup(HumanState state, int count, int[] areaIndices)
     {
