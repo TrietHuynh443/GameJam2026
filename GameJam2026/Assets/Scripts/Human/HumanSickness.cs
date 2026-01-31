@@ -16,39 +16,52 @@ namespace Human
         private bool _isFaceWall = false;
         
         [SerializeField] private Transform _transform;
-        
+
         [SerializeField] private Animator _animator;
-        
+
+        private HumanDirectionType _avoidDir = HumanDirectionType.None;
+        [SerializeField] private NPCStateController _controller;
+        private float _timer;
+
         private void OnEnable()
         {
-            gameObject.layer = LayerMask.NameToLayer("SickHuman");
+            gameObject.layer = LayerMask.NameToLayer("NPC");
             triggerType = TriggerEventType.Infect;
             _startTime = int.MinValue;
         }
 
-        private void FixedUpdate()
+        public void Move()
         {
-            var impactTime = Time.time;
-            if (impactTime - _startTime < MoveDeltaTime)
+            _timer += Time.fixedDeltaTime;
+
+            if (_timer >= 2)
             {
+                _direction = GetDirection();
+                _timer = 0f;
+            }
+            
+            if (_controller.CheckObstacle(HumanDirectionExtension.DirectionMap[_direction]))
+            {
+                _avoidDir = _direction;
+                _direction = GetDirection();
                 return;
             }
-
-            _direction = GetDirection();
+            Vector3 nextPos = transform.position + (Vector3)(HumanDirectionExtension.DirectionMap[_direction] * (0.5f * Time.fixedDeltaTime));
+            
             PlayAnimation(_direction);
-            _startTime = impactTime;
-            _transform.DOMove(_transform.position + (Vector3)HumanDirectionExtension.DirectionMap[_direction], MoveDeltaTime);
+            _transform.position = nextPos;
         }
 
         private HumanDirectionType GetDirection()
         {
-            if (_isFaceWall)
+            var dir = Random.Range(0, 7);
+            if ((HumanDirectionType)dir == _avoidDir)
             {
-                _isFaceWall = false;
-                return HumanDirectionExtension.GetReverseDirection(_direction);
+                dir = (dir + 1) % 8;
             }
+            _avoidDir = HumanDirectionType.None;
 
-            return (HumanDirectionType)Random.Range(0, 7);
+            return (HumanDirectionType)dir;
         }
 
         public void Back()
@@ -64,5 +77,19 @@ namespace Human
                 _animator.Play(animationName);
             }
         }
+
+        public void Infected()
+        {
+        }
+
+        public void Masked()
+        {
+        }
+
+        public void RotateAround()
+        {
+            
+        }
+
     }
 }

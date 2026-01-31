@@ -8,10 +8,6 @@ namespace Human
     public class HumanNormal : MonoBehaviour, IHuman
     {
         public bool isMasked = false;
-        
-        [Header("Anger")]
-        [Range(0f, 1f)]
-        public float becomeAngryChance = 0.1f;
     
         [Header("Movement")]
         public float moveSpeed = 5f;
@@ -23,37 +19,13 @@ namespace Human
         private float _timer;
         private bool _isFaceWall = false;
         [SerializeField] private Transform _transform;
-        private SickHuman _sickHuman;
-        private HumanAngry _angryHuman;
-        
+
         [SerializeField] private Animator _animator;
 
-        private void Start()
-        {
-            _sickHuman = _transform.GetComponentInChildren<SickHuman>(includeInactive: true);
-            _angryHuman = _transform.GetComponentInChildren<HumanAngry>(includeInactive: true);
-        }
+        [SerializeField] private NPCStateController _controller;
 
-        private void OnEnable()
+        public void Infected()
         {
-            GameEvent.GameEvent.Subscribe<EntityMaskedEvent>(WearMask);
-            GameEvent.GameEvent.Subscribe<InfectedEvent>(Infected);
-        }
-
-        
-        private void OnDisable()
-        {
-            GameEvent.GameEvent.Unsubscribe<EntityMaskedEvent>(WearMask);
-            GameEvent.GameEvent.Unsubscribe<InfectedEvent>(Infected);
-        }
-        
-        private void Infected(InfectedEvent obj)
-        {
-            if (obj.Human != gameObject)
-            {
-                return;
-            }
-
             if (isMasked)
             {
                 isMasked = false;
@@ -64,22 +36,46 @@ namespace Human
             
             Debug.Log("Infected ");
             gameObject.SetActive(false);
-            _sickHuman.gameObject.SetActive(true);
             GameEvent.GameEvent.Publish(new ScoreEvent(1, 0));
-
         }
-        
-        void FixedUpdate()
+
+        public void Masked()
+        {
+            isMasked = true;
+        }
+
+        public void RotateAround()
+        {
+        }
+
+        [Header("Anger")]
+        [Range(0f, 1f)]
+        public float becomeAngryChance = 0.1f;
+
+        private HumanDirectionType _avoidDir = HumanDirectionType.None;
+
+        public void Move()
         {
             _timer += Time.fixedDeltaTime;
 
             if (_timer >= changeDirectionTime)
             {
+                if (Random.Range(0, 1f) < becomeAngryChance)
+                {
+                    Debug.Log("Human angry");
+                    _controller.SetState(HumanState.Angry);
+                }
                 _moveDirection = GetDirection();
                 PlayAnimation(_moveDirection);
                 _timer = 0f;
             }
 
+            if (_controller.CheckObstacle(HumanDirectionExtension.DirectionMap[_moveDirection]))
+            {
+                _avoidDir = _moveDirection;
+                _moveDirection = GetDirection();
+                return;
+            }
             Vector3 nextPos = transform.position + (Vector3)(HumanDirectionExtension.DirectionMap[_moveDirection] * moveSpeed * Time.fixedDeltaTime);
             
             if (nextPos.x < minBounds.x || nextPos.x > maxBounds.x ||
@@ -91,22 +87,19 @@ namespace Human
             }
 
             _transform.position = nextPos;
-            
-            if (Random.value < 0.001f)
-            {
-                BecomeAngry();
-            }
+
         }
 
         private HumanDirectionType GetDirection()
         {
-            if (_isFaceWall)
+            var dir = (HumanDirectionType)Random.Range(0, 7);
+            if (dir == _avoidDir)
             {
-                _isFaceWall = false;
-                return HumanDirectionExtension.GetReverseDirection(_moveDirection);
+                dir = HumanDirectionExtension.GetReverseDirection(dir);
             }
+            _avoidDir = HumanDirectionType.None;
 
-            return (HumanDirectionType)Random.Range(0, 7);
+            return dir;
         }
         private void WearMask(EntityMaskedEvent evt)
         {
@@ -129,24 +122,6 @@ namespace Human
         public void Back()
         {
             _isFaceWall = true;
-        }
-        
-        private void BecomeAngry()
-        {
-            if (_angryHuman == null)
-                return;
-
-            if (_angryHuman.gameObject.activeSelf)
-                return;
-
-            if (Random.value > becomeAngryChance)
-                return;
-
-            Debug.Log($"{name} became ANGRY 😡");
-
-            _angryHuman.gameObject.SetActive(true);
-            _angryHuman.isMasked = isMasked;
-            gameObject.SetActive(false);
         }
         
         private void PlayAnimation(HumanDirectionType direction)

@@ -7,6 +7,10 @@ namespace Human
     public interface IHuman
     {
         void Back();
+        void Infected();
+        void Masked();
+        void RotateAround();
+        void Move();
     }
     public enum HumanDirectionType
     {
@@ -18,6 +22,7 @@ namespace Human
         BottomLeft = 5,
         Bottom = 6,
         BottomRight = 7,
+        None = 8,
     }
 
     public static class HumanDirectionExtension
@@ -46,7 +51,7 @@ namespace Human
         };
         public static HumanDirectionType GetReverseDirection(HumanDirectionType dir)
         {
-            return (HumanDirectionType)(7 - dir);
+            return 7 - dir;
         }
         
         public static HumanDirectionType GetDirection(Vector2 dir)
