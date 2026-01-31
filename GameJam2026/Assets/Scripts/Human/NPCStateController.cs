@@ -25,7 +25,7 @@ namespace Human
 
     public class NPCStateController : MonoBehaviour
     {
-        public int isMasked;
+        public int isMasked = 0;
         public bool isBeingDragged = false;
         private Transform _dragSource;
 
@@ -76,7 +76,7 @@ namespace Human
         private bool _isMovingAfterCure;
         
         [Header("Dead Timer")]
-        [SerializeField] private float deadDuration = 120f;
+        [SerializeField] private float deadDuration = 45f;
 
         private float _deadTimer;
         private bool _isDeadCounting;
@@ -143,7 +143,7 @@ namespace Human
                 _angryHuman.Fight(evt);
             else
             {
-                isMasked += 10;
+                isMasked += 25;
                 SetBubble(BubbleState.Masked);
                 SoundManager.Instance.PlaySoundEffect(SoundEffectType.Masked);
                 GameEvent.GameEvent.Publish(new ScoreEvent(0, 1, 0));

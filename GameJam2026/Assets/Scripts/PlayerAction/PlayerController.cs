@@ -21,7 +21,7 @@ namespace PlayerAction
         private HumanDirectionType _currentDir = HumanDirectionType.Bottom;
         private bool _wasMoving;
         private Collider2D _dragTarget;
-        private int _dragNum = 0;
+        private bool isDragging = false;
 
         private void Awake()
         {
@@ -65,19 +65,20 @@ namespace PlayerAction
                 ExecuteActions(other, TriggerPhase.Stay, TriggerEventType.ApplyMask);
             }
 
-            if (_drag.IsPressed() && _dragNum < 1)
+            if (_drag.IsPressed() && !isDragging)
             {
                 _dragTarget = other;
+                isDragging = true;
                 ExecuteActions(_dragTarget, TriggerPhase.Stay, TriggerEventType.Drag);
-                _dragNum = 1;
             }
 
-            if (_stopDrag.IsPressed() && _dragNum > 0)
+            if (_stopDrag.IsPressed() && isDragging)
             {
-                _dragNum = 0;
                 ExecuteActions(_dragTarget, TriggerPhase.Stay, TriggerEventType.StopDrag);
+                isDragging = false;
                 _dragTarget = null;
             }
+            
         }
 
         private void Update()
@@ -102,6 +103,12 @@ namespace PlayerAction
             {
                 PlayAnimation(_currentDir);
             }
+
+            if (_dragTarget == null && isDragging)
+                isDragging = false;
+            
+            if (_dragTarget != null && !isDragging)
+                _dragTarget = null;
 
             _wasMoving = isMoving;
         }

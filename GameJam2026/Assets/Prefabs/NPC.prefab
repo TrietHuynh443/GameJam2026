@@ -406,7 +406,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isMasked: 0
   isBeingDragged: 0
-  isImmune: 0
   normal: {fileID: 4072168062171888579}
   angry: {fileID: 5056261988326373951}
   sick: {fileID: 8251341291770974309}
@@ -437,7 +436,7 @@ MonoBehaviour:
   - {x: -31, y: -12}
   moveToCuredSpeed: 2
   fadeOutDuration: 2
-  deadDuration: 90
+  deadDuration: 45
   fadeInDuration: 2
 --- !u!1 &7089446994216259446
 GameObject:
