@@ -750,8 +750,8 @@ RectTransform:
   - {fileID: 1866669182}
   - {fileID: 127486947}
   - {fileID: 1889376463}
-  - {fileID: 657110228}
   - {fileID: 2072859034}
+  - {fileID: 657110228}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -778,8 +778,8 @@ MonoBehaviour:
   _victory: {fileID: 1866669181}
   _defeat: {fileID: 127486946}
   _normalText: {fileID: 918173753}
-  _infectedText: {fileID: 632235878}
-  _maskedText: {fileID: 1427566625}
+  _infectedText: {fileID: 1427566625}
+  _maskedText: {fileID: 632235878}
 --- !u!1 &632235875
 GameObject:
   m_ObjectHideFlags: 0
@@ -967,7 +967,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 320, y: -480}
+  m_AnchoredPosition: {x: 320, y: -620}
   m_SizeDelta: {x: -640, y: 120}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &657110229
@@ -2832,7 +2832,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 320, y: -620}
+  m_AnchoredPosition: {x: 320, y: -480}
   m_SizeDelta: {x: -640, y: 120}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2072859035

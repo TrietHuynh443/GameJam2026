@@ -40,6 +40,10 @@ public class EndGameUI : MonoBehaviour
 
     private void ChangeScene(bool isBack)
     {
+        PlayerResourcesManager.Instance.Get<PlayerScore>().Normal = 0;
+        PlayerResourcesManager.Instance.Get<PlayerScore>().Sick = 0;
+        PlayerResourcesManager.Instance.Get<PlayerScore>().Masked = 0;
+        
         var scene = EScene.MainScene;
         if (isBack)
         {
