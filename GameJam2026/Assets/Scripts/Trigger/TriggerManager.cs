@@ -65,7 +65,7 @@ namespace Trigger
         #region Handlers
         private void HandleInfected(TriggerEvent evt)
         {
-            if (evt.Phase != TriggerPhase.Enter)
+            if (evt.Phase != TriggerPhase.Enter || evt.Trigger.IsCoolDown)
                 return;
             
             GameEvent.GameEvent.Publish(new InfectedEvent(evt.TriggeredObject));

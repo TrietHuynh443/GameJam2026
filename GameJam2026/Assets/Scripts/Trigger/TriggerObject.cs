@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 
 namespace Trigger
 {
@@ -9,6 +10,7 @@ namespace Trigger
         public bool isAuto = true;
 
         protected readonly List<ITriggerAction> actions = new();
+        public bool IsCoolDown { get; set; }
 
         protected virtual void OnEnable()
         {
@@ -57,6 +59,12 @@ namespace Trigger
                     action.Execute(this, other.gameObject, phase);
                 }
             }
+            UniTask.Void(async () =>
+            {
+                IsCoolDown = true;
+                await UniTask.WaitForSeconds(1f);
+                IsCoolDown = false;
+            });
         }
 
     }
