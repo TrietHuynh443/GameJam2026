@@ -73,6 +73,7 @@ namespace Human
             {
                 _avoidDir = _moveDirection;
                 _moveDirection = GetDirection();
+                PlayAnimation(_moveDirection);
                 return;
             }
             Vector3 nextPos = transform.position + (Vector3)(HumanDirectionExtension.DirectionMap[_moveDirection] * moveSpeed * Time.fixedDeltaTime);

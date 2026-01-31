@@ -866,7 +866,23 @@ MonoBehaviour:
   - normalCount: 2
     angryCount: 0
     sickCount: 0
-    delayAfterWave: 15
+    delayAfterWave: 10
+  - normalCount: 7
+    angryCount: 1
+    sickCount: 2
+    delayAfterWave: 25
+  - normalCount: 10
+    angryCount: 2
+    sickCount: 3
+    delayAfterWave: 40
+  - normalCount: 15
+    angryCount: 0
+    sickCount: 5
+    delayAfterWave: 60
+  - normalCount: 10
+    angryCount: 10
+    sickCount: 10
+    delayAfterWave: 60
   minSpawn: {x: -11.8, y: -32.5}
   maxSpawn: {x: 15.1, y: -24.1}
   spawnContainer: {fileID: 1854661287}
