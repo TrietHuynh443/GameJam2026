@@ -22,17 +22,36 @@ namespace Human
         [SerializeField] private NPCStateController _controller;
         private float _timer;
 
-
+        private const float DeadTime = 120f;
+        private float _deadTimer;
+        private bool _isDead;
+        
         protected override void OnEnable()
         {
             gameObject.layer = LayerMask.NameToLayer("NPC");
             _controller.isMasked = false;
+            
+            _deadTimer = 0f;
+            _isDead = false;
+            
             base.OnEnable();
         }
 
 
         public void Move()
         {
+            if (!_isDead)
+            {
+                _deadTimer += Time.fixedDeltaTime;
+
+                if (_deadTimer >= DeadTime)
+                {
+                    _isDead = true;
+                    Dead();
+                    return;
+                }
+            }
+            
             _timer += Time.fixedDeltaTime;
 
             if (_timer >= 2)
@@ -95,8 +114,16 @@ namespace Human
         {
         }
 
+        public void Dead()
+        {
+            GameEvent.GameEvent.Publish<EntityDeadEvent>(new EntityDeadEvent(this.gameObject));
+        }
+
         public void Cured()
         {
+            _deadTimer = 0f;
+            _isDead = false;
+            
             GameEvent.GameEvent.Publish<ScoreEvent>(new ScoreEvent(-1, 0, 1));
             _controller.SetState(HumanState.Normal);
         }

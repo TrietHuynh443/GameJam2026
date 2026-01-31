@@ -343,7 +343,9 @@ MonoBehaviour:
   _feverObject: {fileID: 779152500561271560}
   _angryObject: {fileID: 2266227253017829036}
   _maskedObject: {fileID: 5451842486934549203}
-  curedDestination: {x: -12.6, y: -7.25}
+  curedDestinations:
+  - {x: -12, y: -9}
+  - {x: -31, y: -12}
   moveToCuredSpeed: 2.5
   fadeOutDuration: 0.5
   fadeInDuration: 0.5

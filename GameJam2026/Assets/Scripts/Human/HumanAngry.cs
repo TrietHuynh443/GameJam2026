@@ -114,7 +114,7 @@ namespace Human
                 GameEvent.GameEvent.Publish(new ScoreEvent(0, -1, 0));
                 return;
             }
-
+            
             Debug.Log($"{name} is too ANGRY 😡 to wear a mask!");
         }
 
