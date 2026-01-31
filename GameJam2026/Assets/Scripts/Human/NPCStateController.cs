@@ -198,7 +198,7 @@ namespace Human
         
         private void OnCure(EntityCureEvent evt)
         {
-            if (evt.Target.transform.parent?.gameObject != gameObject)
+            if (evt.Target.transform.parent?.gameObject != gameObject || _current is not SickHuman)
                 return;
 
             if (_isMovingAfterCure)
