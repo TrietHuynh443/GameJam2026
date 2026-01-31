@@ -109,12 +109,13 @@ namespace Human
 
             if (_controller.isMasked)
             {
-                Debug.Log($"{name} already 😡 wear a mask but your insist make him throw it away");
+                _controller.SetBubble(BubbleState.Angry);
                 _controller.isMasked = false;
                 GameEvent.GameEvent.Publish(new ScoreEvent(0, -1, 0));
                 return;
             }
             
+            _controller.SetBubble(BubbleState.Angry);
             Debug.Log($"{name} is too ANGRY 😡 to wear a mask!");
         }
 

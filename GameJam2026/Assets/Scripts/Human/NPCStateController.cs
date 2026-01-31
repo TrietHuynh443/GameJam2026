@@ -18,7 +18,9 @@ namespace Human
     {
         Masked,
         Angry,
-        Sick
+        Sick,
+        Healing,
+        Dead
     }
 
     public class NPCStateController : MonoBehaviour
@@ -56,6 +58,8 @@ namespace Human
         [SerializeField] private GameObject _angryIcon;
         [SerializeField] private GameObject _maskedIcon;
         [SerializeField] private GameObject _sickIcon;
+        [SerializeField] private GameObject _healIcon;
+        [SerializeField] private GameObject _deadIcon;
         
         [SerializeField] private GameObject _feverObject;
         [SerializeField] private GameObject _angryObject;
@@ -203,13 +207,15 @@ namespace Human
 
 
 
-        private void SetBubble(BubbleState state)
+        public void SetBubble(BubbleState state, float duration = 1f)
         {
             _angryIcon.SetActive(state == BubbleState.Angry);
             _maskedIcon.SetActive(state == BubbleState.Masked);
             _sickIcon.SetActive(state == BubbleState.Sick);
+            _sickIcon.SetActive(state == BubbleState.Healing);
+            _sickIcon.SetActive(state == BubbleState.Dead);
             _bubble.SetActive(true);
-            UniTask.WaitForSeconds(1f).ContinueWith(() => _bubble.SetActive(false));
+            UniTask.WaitForSeconds(duration).ContinueWith(() => _bubble.SetActive(false));
         }
         
         
