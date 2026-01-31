@@ -31,13 +31,13 @@ public class PlayerWalk : MonoBehaviour
         _sprint.Disable();
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         Vector2 input = _move.ReadValue<Vector2>();
 
         bool isSprinting = _sprint.IsPressed();
         float speed = isSprinting ? walkSpeed * sprintMultiplier : walkSpeed;
 
-        transform.position += (Vector3)(input * speed * Time.deltaTime);
+        transform.position += (Vector3)(input * speed * Time.fixedDeltaTime);
     }
 }
