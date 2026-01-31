@@ -319,6 +319,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isMasked: 0
   isBeingDragged: 0
+  isImmune: 0
   normal: {fileID: 4072168062171888579}
   angry: {fileID: 5056261988326373951}
   sick: {fileID: 8251341291770974309}
@@ -342,6 +343,12 @@ MonoBehaviour:
   _auraObject: {fileID: 623819590110945732}
   _angryObject: {fileID: 65830898073801598}
   _maskedObject: {fileID: 5451842486934549203}
+  curedDestinations:
+  - {x: -12, y: -9}
+  - {x: -31, y: -12}
+  moveToCuredSpeed: 2.5
+  fadeOutDuration: 0.5
+  fadeInDuration: 0.5
 --- !u!1 &7089446994216259446
 GameObject:
   m_ObjectHideFlags: 0

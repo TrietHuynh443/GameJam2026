@@ -64,7 +64,7 @@ namespace Human
         [SerializeField] private GameObject _maskedObject;
         
         [Header("After Cure Movement")]
-        [SerializeField] private Transform[] curedDestinations;
+        [SerializeField] private List<Vector2> curedDestinations;
         [SerializeField] private float moveToCuredSpeed = 2.5f;
         [SerializeField] private float fadeOutDuration = 0.5f;
 
@@ -96,6 +96,7 @@ namespace Human
             GameEvent.GameEvent.Subscribe<EntityDragEvent>(OnDrag);
             GameEvent.GameEvent.Subscribe<EntityStopDragEvent>(OnStopDrag);
             GameEvent.GameEvent.Subscribe<EntityCureEvent>(OnCure);
+            GameEvent.GameEvent.Subscribe<EntityDeadEvent>(OnDead);
         }
         
         private void Awake()
@@ -149,7 +150,7 @@ namespace Human
             }
             else
             {
-                GameEvent.GameEvent.Publish<ScoreEvent>(new ScoreEvent(1, 0, 0));
+                GameEvent.GameEvent.Publish<ScoreEvent>(new ScoreEvent(1, 0, -1));
             }
             
             SetState(HumanState.Sick);
@@ -189,12 +190,15 @@ namespace Human
             isImmune = true;
             _sickHuman.Cured();
 
-            isBeingDragged = false;
-            _dragSource = null;
+            StartCoroutine(WaitTillRelease());
+        }
 
-            StartCoroutine(WaitAndTurn());
-
-            _moveAfterCureRoutine = StartCoroutine(MoveAfterCure());
+        private void OnDead(EntityDeadEvent evt)
+        {
+            if (evt.Target.transform.parent?.gameObject != gameObject)
+                return;
+            
+            StartCoroutine(FadeOutAndDisable());
         }
 
 
@@ -217,6 +221,7 @@ namespace Human
             GameEvent.GameEvent.Unsubscribe<EntityDragEvent>(OnDrag);
             GameEvent.GameEvent.Unsubscribe<EntityStopDragEvent>(OnStopDrag);
             GameEvent.GameEvent.Unsubscribe<EntityCureEvent>(OnCure);
+            GameEvent.GameEvent.Unsubscribe<EntityDeadEvent>(OnDead);
 
         }
         
@@ -349,42 +354,60 @@ namespace Human
             _animatorMask.speed = speed;
             _isWaiting = false;
         }
-        
-        private Transform GetRandomCuredDestination()
-        {
-            if (curedDestinations == null || curedDestinations.Length == 0)
-                return null;
 
-            return curedDestinations[Random.Range(0, curedDestinations.Length)];
+        private IEnumerator WaitTillRelease()
+        {
+            yield return new WaitUntil(() => isBeingDragged == false);
+
+            if (_isMovingAfterCure)
+                yield break;
+
+            StartCoroutine(MoveAfterCure());
+        }
+
+        private Vector2 GetNearestCuredDestination()
+        {
+            Vector2 best = new Vector2(100f, 100f);
+            float minDist = float.MaxValue;
+
+            foreach (var t in curedDestinations)
+            {
+                float d = Vector2.Distance(transform.position, t);
+                if (d < minDist)
+                {
+                    minDist = d;
+                    best = t;
+                }
+            }
+            return best;
         }
 
         
         private IEnumerator MoveAfterCure()
         {
-            Transform destination = GetRandomCuredDestination();
-            if (destination == null)
-            {
-                Debug.LogWarning("No cured destinations assigned", this);
-                yield break;
-            }
+            Vector2 destination = GetNearestCuredDestination();
+            yield return new WaitForSeconds(2f);
+            SetBubble(BubbleState.Masked);
 
             _isMovingAfterCure = true;
 
             SetState(HumanState.Normal);
 
-            while (Vector2.Distance(transform.position, destination.position) > 0.1f)
+            while (Vector2.Distance(transform.position, destination) > 0.1f)
             {
                 transform.position = Vector3.MoveTowards(
                     transform.position,
-                    destination.position,
+                    destination,
                     moveToCuredSpeed * Time.deltaTime
                 );
+                
 
                 yield return null;
             }
+            _isMovingAfterCure = false;
 
-            yield return FadeOutAndDisable();
         }
+
 
         public void ResetState()
         {

@@ -89,5 +89,13 @@ namespace GameEvent.Events
         }
     }
     
+    public struct EntityDeadEvent : IEvent
+    {
+        public GameObject Target;
 
+        public EntityDeadEvent(GameObject target)
+        {
+            Target = target;
+        }
+    }
 }
