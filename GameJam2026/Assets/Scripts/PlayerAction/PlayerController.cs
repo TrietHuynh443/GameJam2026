@@ -1,9 +1,11 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Trigger;
+using Human;
 
-namespace Human.PlayerAction
+namespace PlayerAction
 {
-    public class PlayerController: MonoBehaviour
+    public class PlayerController: TriggerObject
     {
         public InputActionAsset InputActions;
         public float walkSpeed = 5f;
@@ -11,16 +13,22 @@ namespace Human.PlayerAction
 
         private InputAction _move;
         private InputAction _sprint;
+        private InputAction _applyMask;
         private Animator _animator;
 
         private HumanDirectionType _currentDir = HumanDirectionType.Bottom;
         private bool _wasMoving;
+        
+        private TriggerObject _currentTrigger;
+        private bool _interactPressed;
+
 
         private void Awake()
         {
             var playerMap = InputActions.FindActionMap("Player");
             _move = playerMap.FindAction("Move");
             _sprint = playerMap.FindAction("Sprint");
+            _applyMask = playerMap.FindAction("Interact");
 
             _animator = GetComponent<Animator>();
         }
@@ -29,12 +37,23 @@ namespace Human.PlayerAction
         {
             _move.Enable();
             _sprint.Enable();
+            _applyMask.Enable();
+            isAuto = false;
         }
 
         private void OnDisable()
         {
             _move.Disable();
             _sprint.Disable();
+            _applyMask.Disable();
+        }
+
+        protected override void OnTriggerStay2D(Collider2D other)
+        {
+            if (_applyMask.IsPressed())
+            {
+                RaiseEvent(other, TriggerPhase.Stay);
+            }
         }
 
         private void Update()

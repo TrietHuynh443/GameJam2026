@@ -7,8 +7,6 @@ namespace Human
 {
     public class HumanNormal : MonoBehaviour, IHuman
     {
-        public bool isMasked = false;
-    
         [Header("Movement")]
         public float moveSpeed = 5f;
         public float changeDirectionTime = 10f;
@@ -26,9 +24,9 @@ namespace Human
 
         public void Infected()
         {
-            if (isMasked)
+            if (_controller.isMasked)
             {
-                isMasked = false;
+                _controller.isMasked = false;
                 Debug.Log("My mask effect wear off!");
                 GameEvent.GameEvent.Publish(new ScoreEvent(0, -1));
                 return;
@@ -41,7 +39,7 @@ namespace Human
 
         public void Masked()
         {
-            isMasked = true;
+            _controller.isMasked = true;
         }
 
         public void RotateAround()
@@ -108,13 +106,13 @@ namespace Human
                 return;
             }
         
-            if (isMasked)
+            if (_controller.isMasked)
             {
                 Debug.Log("I already wear a mask!");
                 return;
             }
         
-            isMasked = true;
+            _controller.isMasked = true;
             Debug.Log("I wear a mask!");
             GameEvent.GameEvent.Publish(new ScoreEvent(0, 1));
         }

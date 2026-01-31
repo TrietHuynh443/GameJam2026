@@ -16,6 +16,7 @@ namespace Human
 
     public class NPCStateController : MonoBehaviour
     {
+        public bool isMasked = false;
         [Header("State Objects")]
         [SerializeField] private GameObject normal;
         [SerializeField] private GameObject angry;
@@ -32,24 +33,31 @@ namespace Human
         [SerializeField] private HumanAngry _angryHuman;
         [SerializeField] private HumanNormal _normalHuman;
 
-        [SerializeField] private HumanState _initState = HumanState.Normal;
+        private HumanState currentState = HumanState.Normal;
         
         private IHuman _current;
         private void OnEnable()
         {
             if (_current == null)
             {
-                SetState(_initState);
+                SetState(currentState);
             }
             GameEvent.GameEvent.Subscribe<InfectedEvent>(OnInfected);
             GameEvent.GameEvent.Subscribe<EntityMaskedEvent>(OnMasked);
         }
 
-        private void OnMasked(EntityMaskedEvent obj)
+        private void OnMasked(EntityMaskedEvent evt)
         {
+            if (evt.HumanNormal.transform.parent?.gameObject != gameObject)
+                return;
+
+            if (currentState is HumanState.Angry)
+                return;
+            
             _normalHuman.Masked();
             _angryHuman.Masked();
         }
+
 
         private void OnInfected(InfectedEvent obj)
         {
@@ -68,15 +76,14 @@ namespace Human
 
         public void SetState(HumanState state)
         {
+            currentState = state;
             switch (state)
             {
                 case HumanState.Normal:
-                    _normalHuman.isMasked = _angryHuman.isMasked;
                     _current = _normalHuman;
                     break;
 
                 case HumanState.Angry:
-                    _angryHuman.isMasked = _normalHuman.isMasked;
                     _current = _angryHuman;
                     break;
 

@@ -108,4 +108,14 @@ public class GameManager : MonoBehaviour
 
         score = _score.Amount;
     }
+    
+#if UNITY_EDITOR
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.green;
+        Vector2 center = (minSpawn + maxSpawn) * 0.5f;
+        Vector2 size = maxSpawn - minSpawn;
+        Gizmos.DrawWireCube(center, size);
+    }
+#endif
 }

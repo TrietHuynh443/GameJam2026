@@ -5,8 +5,6 @@ namespace Human
 {
     public class HumanAngry : MonoBehaviour, IHuman
     {
-        public bool isMasked = false;
-    
         [Header("Movement")]
         public float moveSpeed = 10f;
         public float changeDirectionTime = 5f;
@@ -40,9 +38,9 @@ namespace Human
         }
         public void Infected()
         {
-            if (isMasked)
+            if (_controller.isMasked)
             {
-                isMasked = false;
+                _controller.isMasked = false;
                 return;
             }
             
@@ -52,7 +50,7 @@ namespace Human
 
         public void Masked()
         {
-            isMasked = true;
+            _controller.isMasked = true;
         }
 
         public void RotateAround()
@@ -112,10 +110,10 @@ namespace Human
             if (evt.HumanAngry != gameObject)
                 return;
 
-            if (isMasked)
+            if (_controller.isMasked)
             {
                 Debug.Log($"{name} already 😡 wear a mask but your insist make him throw it away");
-                isMasked = false;
+                _controller.isMasked = false;
                 return;
             }
 
