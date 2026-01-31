@@ -98,7 +98,6 @@ namespace Human
             SetBubble(BubbleState.Sick);
             
             StartCoroutine(WaitAndTurn());
-
         }
 
         private void OnDrag(EntityDragEvent evt)
@@ -209,6 +208,8 @@ namespace Human
 
         private IEnumerator WaitAndTurn()
         {
+            if (_isWaiting) yield break;
+            
             float speed = _animator.speed;
             _isWaiting = true;
             _animator.speed = 0;

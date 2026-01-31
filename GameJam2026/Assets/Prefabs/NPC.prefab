@@ -315,6 +315,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isMasked: 0
+  isBeingDragged: 0
   normal: {fileID: 4072168062171888579}
   angry: {fileID: 5056261988326373951}
   sick: {fileID: 8251341291770974309}
@@ -328,10 +329,11 @@ MonoBehaviour:
   _animator: {fileID: 4197065952167025250}
   _animatorMask: {fileID: 4254427563701512307}
   currentState: 0
-  _bubble: {fileID: 0}
-  _angryIcon: {fileID: 0}
-  _maskedIcon: {fileID: 0}
-  _sickIcon: {fileID: 0}
+  _bubble: {fileID: 8255518494373746522}
+  _angryIcon: {fileID: 578309859736502219}
+  _maskedIcon: {fileID: 7089446994216259446}
+  _sickIcon: {fileID: 5018222227385083714}
+  _maskedObject: {fileID: 5451842486934549203}
 --- !u!1 &7089446994216259446
 GameObject:
   m_ObjectHideFlags: 0
@@ -597,6 +599,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mask
       objectReference: {fileID: 0}
+    - target: {fileID: -2253911629886400664, guid: eb8cfaddb5a102d43ab929c3e097a29b, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3626916397498700004, guid: eb8cfaddb5a102d43ab929c3e097a29b, type: 3}
       propertyPath: m_SortingOrder
       value: 30
@@ -654,6 +660,11 @@ Animator:
 --- !u!4 &5063505397149211318 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7878350319992209165, guid: eb8cfaddb5a102d43ab929c3e097a29b, type: 3}
+  m_PrefabInstance: {fileID: 3103167657980093883}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &5451842486934549203 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -2253911629886400664, guid: eb8cfaddb5a102d43ab929c3e097a29b, type: 3}
   m_PrefabInstance: {fileID: 3103167657980093883}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4452949258831934184

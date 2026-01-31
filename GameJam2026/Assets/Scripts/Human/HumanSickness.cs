@@ -18,7 +18,6 @@ namespace Human
         [SerializeField] private Transform _transform;
 
         [SerializeField] private Animator _animator;
-        [SerializeField] private Animator _animatorMask;
 
         private HumanDirectionType _avoidDir = HumanDirectionType.None;
         [SerializeField] private NPCStateController _controller;
@@ -85,7 +84,6 @@ namespace Human
             if (!_animator.GetCurrentAnimatorStateInfo(0).IsName(animationName))
             {
                 _animator.Play(animationName);
-                _animatorMask.Play(animationName);
             }
         }
 
