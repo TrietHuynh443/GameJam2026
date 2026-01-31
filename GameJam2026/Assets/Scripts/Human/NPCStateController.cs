@@ -42,6 +42,7 @@ namespace Human
         [SerializeField] private HumanNormal _normalHuman;
 
         [SerializeField] private Animator _animator;
+        [SerializeField] private Animator _animatorMask;
         [SerializeField] public HumanState currentState = HumanState.Normal;
         
 
@@ -166,8 +167,13 @@ namespace Human
 
         private IEnumerator WaitAndTurn()
         {
+            float speed = _animator.speed;
             _isWaiting = true;
+            _animator.speed = 0;
+            _animatorMask.speed = 0;
             yield return new WaitForSeconds(1f);
+            _animator.speed = speed;
+            _animatorMask.speed = speed;
             _isWaiting = false;
         }
 
