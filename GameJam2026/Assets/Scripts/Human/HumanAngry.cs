@@ -39,17 +39,14 @@ namespace Human
         {
             if (_controller.isMasked)
             {
-                _controller.isMasked = false;
                 return;
             }
             
             _controller.SetState(HumanState.Sick);
-            
         }
 
         public void Masked()
         {
-            _controller.isMasked = true;
         }
 
         public void RotateAround()
@@ -114,6 +111,7 @@ namespace Human
             {
                 Debug.Log($"{name} already 😡 wear a mask but your insist make him throw it away");
                 _controller.isMasked = false;
+                GameEvent.GameEvent.Publish(new ScoreEvent(0, -1, 0));
                 return;
             }
 

@@ -93,17 +93,19 @@ namespace Human
 
         private void OnMasked(EntityMaskedEvent evt)
         {
-            if (evt.HumanNormal.transform.parent?.gameObject != gameObject || currentState == HumanState.Sick)
+            if (evt.HumanNormal.transform.parent?.gameObject != gameObject 
+                || currentState == HumanState.Sick
+                || isMasked)
                 return;
 
             if (currentState is HumanState.Angry)
                 _angryHuman.Fight(evt);
             else
             {
-                _normalHuman.Masked();
-                _angryHuman.Masked();
+                isMasked = true;
                 SetBubble(BubbleState.Masked);
                 SoundManager.Instance.PlaySoundEffect(SoundEffectType.Masked);
+                GameEvent.GameEvent.Publish(new ScoreEvent(0, 1, 0));
                 StartCoroutine(WaitAndTurn());
             }
         }
@@ -113,9 +115,19 @@ namespace Human
         {
             if(obj.Human.transform.parent?.gameObject != gameObject) 
                 return;
-            
+            if (isMasked)
+            {
+                isMasked = false;
+                GameEvent.GameEvent.Publish<ScoreEvent>(new ScoreEvent(0, -1, 0));
+            }
+            else
+            {
+                GameEvent.GameEvent.Publish<ScoreEvent>(new ScoreEvent(1, 0, 0));
+            }
+
             _normalHuman.Infected();
             _angryHuman.Infected();
+            
             SetBubble(BubbleState.Sick);
             
             StartCoroutine(WaitAndTurn());

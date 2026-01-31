@@ -6,7 +6,6 @@ using Extension;
 using GameEvent.Events;
 using Unity.VisualScripting;
 using UnityCommunity.UnitySingleton;
-using UnityEngine;
 
 namespace PlayerResources
 {
@@ -30,7 +29,18 @@ namespace PlayerResources
 
         private void RegisterGameEvents()
         {
-            GameEvent.GameEvent.Subscribe<NextDaysEvent>(SkipToNextTime);
+            GameEvent.GameEvent.Subscribe<ScoreEvent>(HandleScoreChanged);
+        }
+
+        private object _lock = new();
+        private void HandleScoreChanged(ScoreEvent obj)
+        {
+            lock (_lock)
+            {
+                Get<PlayerScore>().Masked += obj.Masked;
+                Get<PlayerScore>().Normal += obj.Normal;
+                Get<PlayerScore>().Sick += obj.Infected;
+            }   
         }
 
         public T Get<T>() where T : PlayerResources
@@ -42,13 +52,6 @@ namespace PlayerResources
             return _playerResourcesMap[typeof(T)] as T;
         }
     
-        private void SkipToNextTime(NextDaysEvent evt)
-        {
-            foreach (var resource in _playerResourcesMap.Values)
-            {
-                for(int i = 1; i <= evt.Days; ++i)
-                    resource.Current();
-            }
-        }
+        
     }
 }
