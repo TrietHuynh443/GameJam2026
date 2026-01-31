@@ -15,7 +15,6 @@ namespace Human
 
         private HumanDirectionType _moveDirection;
         private float _timer;
-        private bool _isFaceWall = false;
         [SerializeField] private Transform _transform;
 
         [SerializeField] private Animator _animator;
@@ -121,7 +120,7 @@ namespace Human
 
         public void Back()
         {
-            _isFaceWall = true;
+            
         }
         
         private void PlayAnimation(HumanDirectionType direction)

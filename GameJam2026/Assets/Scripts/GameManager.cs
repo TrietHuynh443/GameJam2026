@@ -5,6 +5,10 @@ using PlayerResources;
 using GameEvent.Events;
 using GameData;
 
+using GameData;
+using UnityEngine;
+using System.Collections;
+
 public class GameManager : MonoBehaviour
 {
     [Header("NPC Pool")]
@@ -14,13 +18,12 @@ public class GameManager : MonoBehaviour
     [Header("Waves")]
     [SerializeField] private SpawnWave[] waves;
 
-    [Header("Spawn Area")]
-    public Vector2 minSpawn;
-    public Vector2 maxSpawn;
+    [Header("Spawn Areas")]
+    [SerializeField] private SpawnArea[] spawnAreas;
+
     [SerializeField] private Transform spawnContainer;
 
     private ObjectPool<NPCStateController> _npcPool;
-
     private PlayerScore _score;
     public float score;
 
@@ -50,6 +53,7 @@ public class GameManager : MonoBehaviour
         StartCoroutine(SpawnWaves());
     }
 
+
     // ----------------------------
     // WAVE SYSTEM
     // ----------------------------
@@ -57,14 +61,13 @@ public class GameManager : MonoBehaviour
     {
         for (int i = 0; i < waves.Length; i++)
         {
-            Debug.Log("Spawning wave " + (i + 1));
             SpawnWave wave = waves[i];
+            Debug.Log($"Spawning wave {i + 1}");
 
-            SpawnGroup(HumanState.Normal, wave.normalCount);
-            SpawnGroup(HumanState.Angry, wave.angryCount);
-            SpawnGroup(HumanState.Sick, wave.sickCount);
+            SpawnGroup(HumanState.Normal, wave.normalCount, wave.spawnAreaIndices);
+            SpawnGroup(HumanState.Angry, wave.angryCount, wave.spawnAreaIndices);
+            SpawnGroup(HumanState.Sick, wave.sickCount, wave.spawnAreaIndices);
 
-            // Update score/resources
             _score.UpdateResource(
                 PlayerResourceChangeReason.Normal,
                 wave.normalCount + wave.angryCount
@@ -79,24 +82,29 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void SpawnGroup(HumanState state, int count)
+
+    private void SpawnGroup(HumanState state, int count, int[] areaIndices)
     {
+        if (count <= 0 || areaIndices == null || areaIndices.Length == 0)
+            return;
+
         for (int i = 0; i < count; i++)
         {
             NPCStateController npc = _npcPool.Get();
-            npc.transform.position = GetRandomPosition();
+
+            SpawnArea area = GetRandomSpawnArea(areaIndices);
+            npc.transform.position = area.GetRandomPosition();
+
             npc.SetState(state);
         }
     }
 
-    private Vector3 GetRandomPosition()
+    private SpawnArea GetRandomSpawnArea(int[] areaIndices)
     {
-        return new Vector3(
-            Random.Range(minSpawn.x, maxSpawn.x),
-            Random.Range(minSpawn.y, maxSpawn.y),
-            0f
-        );
+        int index = areaIndices[Random.Range(0, areaIndices.Length)];
+        return spawnAreas[Mathf.Clamp(index, 0, spawnAreas.Length - 1)];
     }
+
 
     private void OnScoreEvent(ScoreEvent evt)
     {
@@ -112,10 +120,17 @@ public class GameManager : MonoBehaviour
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected()
     {
+        if (spawnAreas == null) return;
+
         Gizmos.color = Color.green;
-        Vector2 center = (minSpawn + maxSpawn) * 0.5f;
-        Vector2 size = maxSpawn - minSpawn;
-        Gizmos.DrawWireCube(center, size);
+
+        foreach (var area in spawnAreas)
+        {
+            Vector2 center = (area.min + area.max) * 0.5f;
+            Vector2 size = area.max - area.min;
+            Gizmos.DrawWireCube(center, size);
+        }
     }
 #endif
+
 }

@@ -15,13 +15,13 @@ namespace PlayerAction
         private InputAction _sprint;
         private InputAction _applyMask;
         private InputAction _drag;
+        private InputAction _stopDrag;
         private Animator _animator;
 
         private HumanDirectionType _currentDir = HumanDirectionType.Bottom;
         private bool _wasMoving;
-        private bool _isDragging = false;
         private Collider2D _dragTarget;
-        private float _nextDragAllowedTime;
+        private int _dragNum = 0;
 
         [SerializeField] private float dragToggleCooldown = 0.25f;
         
@@ -32,7 +32,7 @@ namespace PlayerAction
             _sprint = playerMap.FindAction("Sprint");
             _applyMask = playerMap.FindAction("Interact");
             _drag = playerMap.FindAction("Drag");
-            
+            _stopDrag = playerMap.FindAction("StopDrag");
 
             _animator = GetComponent<Animator>();
         }
@@ -43,6 +43,8 @@ namespace PlayerAction
             _sprint.Enable();
             _applyMask.Enable();
             _drag.Enable();
+            _stopDrag.Enable();
+            
             isAuto = false;
             
             base.OnEnable();
@@ -54,6 +56,7 @@ namespace PlayerAction
             _sprint.Disable();
             _applyMask.Disable();
             _drag.Disable();
+            _stopDrag.Disable();
         }
 
         protected override void OnTriggerStay2D(Collider2D other)
@@ -64,33 +67,21 @@ namespace PlayerAction
                 ExecuteActions(other, TriggerPhase.Stay, TriggerEventType.ApplyMask);
             }
 
-            // 2. Guard Clauses for Dragging
-            if (!_drag.IsPressed()) return;
-            if (Time.time < _nextDragAllowedTime) return;
-
-            // 3. Logic Branching
-            if (!_isDragging)
+            if (_drag.IsPressed() && _dragNum < 1)
             {
-                // START DRAGGING
-                _isDragging = true;
                 _dragTarget = other;
                 ExecuteActions(_dragTarget, TriggerPhase.Stay, TriggerEventType.Drag);
-        
-                // Apply cooldown after starting
-                _nextDragAllowedTime = Time.time + dragToggleCooldown;
+                _dragNum = 1;
             }
-            else if (_dragTarget == other)
-            {
-                // STOP DRAGGING
-                ExecuteActions(_dragTarget, TriggerPhase.Stay, TriggerEventType.StopDrag);
-                _isDragging = false;
-                _dragTarget = null;
 
-                // Apply cooldown after stopping
-                _nextDragAllowedTime = Time.time + dragToggleCooldown;
+            if (_stopDrag.IsPressed() && _dragNum > 0)
+            {
+                _dragNum = 0;
+                ExecuteActions(_dragTarget, TriggerPhase.Stay, TriggerEventType.StopDrag);
+                _dragTarget = null;
             }
         }
-        
+
         private void Update()
         {
             Vector2 input = _move.ReadValue<Vector2>();

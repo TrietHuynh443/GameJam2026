@@ -636,8 +636,8 @@ MonoBehaviour:
   target: {fileID: 449455340}
   dampTime: 0.25
   offset: {x: 0, y: 0, z: -10}
-  minBounds: {x: -30.9, y: -34.2}
-  maxBounds: {x: 17.9, y: -1.3}
+  minBounds: {x: -36.8, y: -38}
+  maxBounds: {x: 18.5, y: -0.66}
   worldPlaneZ: 0
 --- !u!1 &1069168735
 GameObject:
@@ -917,25 +917,49 @@ MonoBehaviour:
   - normalCount: 2
     angryCount: 0
     sickCount: 0
+    spawnAreaIndices: 00000000
     delayAfterWave: 5
   - normalCount: 7
     angryCount: 1
     sickCount: 2
+    spawnAreaIndices: 01000000
     delayAfterWave: 25
   - normalCount: 10
     angryCount: 2
     sickCount: 3
+    spawnAreaIndices: 02000000
     delayAfterWave: 40
   - normalCount: 15
     angryCount: 0
     sickCount: 5
+    spawnAreaIndices: 0000000001000000
     delayAfterWave: 60
   - normalCount: 10
     angryCount: 10
     sickCount: 10
+    spawnAreaIndices: 0100000002000000
     delayAfterWave: 60
-  minSpawn: {x: -11.8, y: -32.5}
-  maxSpawn: {x: 15.1, y: -24.1}
+  - normalCount: 10
+    angryCount: 10
+    sickCount: 10
+    spawnAreaIndices: 
+    delayAfterWave: 60
+  spawnAreas:
+  - id: 
+    min: {x: -14.9, y: -3.29}
+    max: {x: 16.26, y: -9.21}
+  - id: 
+    min: {x: -13.2, y: -23.6}
+    max: {x: 16.26, y: -32.51}
+  - id: 
+    min: {x: -13.2, y: -23.6}
+    max: {x: 16.26, y: -32.51}
+  - id: 
+    min: {x: -7.1, y: -3.4}
+    max: {x: 6.5, y: -32.51}
+  - id: 
+    min: {x: -35.4, y: -2.68}
+    max: {x: -32.7, y: -32.51}
   spawnContainer: {fileID: 1854661287}
   score: 0
 --- !u!213 &1469106345
@@ -1202,10 +1226,6 @@ PrefabInstance:
     - target: {fileID: 4380106270775688894, guid: ed671aa81501249d09e5d2244083b339, type: 3}
       propertyPath: m_Name
       value: Map
-      objectReference: {fileID: 0}
-    - target: {fileID: 4380106270775688894, guid: ed671aa81501249d09e5d2244083b339, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6747446317819305674, guid: ed671aa81501249d09e5d2244083b339, type: 3}
       propertyPath: m_LocalPosition.x
