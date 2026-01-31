@@ -24,6 +24,7 @@ namespace Human
     {
         public bool isMasked = false;
         public bool isBeingDragged = false;
+        public bool isImmune = false;
         private Transform _dragSource;
 
         [Header("State Objects")]
@@ -53,9 +54,34 @@ namespace Human
         [SerializeField] private GameObject _sickIcon;
         
         [SerializeField] private GameObject _feverObject;
+        
+        private bool _isWaiting = false;
+        [SerializeField] private GameObject _maskedObject;
+        
+        [Header("After Cure Movement")]
+        [SerializeField] private Transform[] curedDestinations;
+        [SerializeField] private float moveToCuredSpeed = 2.5f;
+        [SerializeField] private float fadeOutDuration = 0.5f;
+
+        private Coroutine _moveAfterCureRoutine;
+        private Coroutine _fadeOutRoutine;
+        private bool _isMovingAfterCure;
+
+        
+        [Header("Fade In")]
+        [SerializeField] private float fadeInDuration = 0.5f;
+        private Coroutine _fadeRoutine;
+        
         private IHuman _current;
         private void OnEnable()
         {
+            SetAlpha(0f);
+
+            if (_fadeRoutine != null)
+                StopCoroutine(_fadeRoutine);
+
+            _fadeRoutine = StartCoroutine(FadeIn());
+            
             if (_current == null)
             {
                 SetState(currentState);
@@ -64,6 +90,7 @@ namespace Human
             GameEvent.GameEvent.Subscribe<EntityMaskedEvent>(OnMasked);
             GameEvent.GameEvent.Subscribe<EntityDragEvent>(OnDrag);
             GameEvent.GameEvent.Subscribe<EntityStopDragEvent>(OnStopDrag);
+            GameEvent.GameEvent.Subscribe<EntityCureEvent>(OnCure);
         }
 
 
@@ -92,7 +119,7 @@ namespace Human
 
         private void OnInfected(InfectedEvent obj)
         {
-            if(obj.Human.transform.parent?.gameObject != gameObject) 
+            if(obj.Human.transform.parent?.gameObject != gameObject || isImmune) 
                 return;
             
             _normalHuman.Infected();
@@ -120,6 +147,26 @@ namespace Human
             isBeingDragged = false;
             _dragSource = null;
         }
+        
+        private void OnCure(EntityCureEvent evt)
+        {
+            if (evt.Target.transform.parent?.gameObject != gameObject)
+                return;
+
+            if (_isMovingAfterCure)
+                return;
+
+            isImmune = true;
+            _sickHuman.Cured();
+
+            isBeingDragged = false;
+            _dragSource = null;
+
+            StartCoroutine(WaitAndTurn());
+
+            _moveAfterCureRoutine = StartCoroutine(MoveAfterCure());
+        }
+
 
 
         private void SetBubble(BubbleState state)
@@ -139,7 +186,55 @@ namespace Human
             GameEvent.GameEvent.Unsubscribe<EntityMaskedEvent>(OnMasked);
             GameEvent.GameEvent.Unsubscribe<EntityDragEvent>(OnDrag);
             GameEvent.GameEvent.Unsubscribe<EntityStopDragEvent>(OnStopDrag);
+            GameEvent.GameEvent.Unsubscribe<EntityCureEvent>(OnCure);
 
+        }
+        
+        private IEnumerator FadeIn()
+        {
+            float time = 0f;
+
+            while (time < fadeInDuration)
+            {
+                time += Time.deltaTime;
+                float alpha = Mathf.Clamp01(time / fadeInDuration);
+                SetAlpha(alpha);
+                yield return null;
+            }
+
+            SetAlpha(1f);
+        }
+        
+        private IEnumerator FadeOutAndDisable()
+        {
+            if (_fadeOutRoutine != null)
+                StopCoroutine(_fadeOutRoutine);
+
+            float time = 0f;
+            float startAlpha = spriteRenderer.color.a;
+
+            while (time < fadeOutDuration)
+            {
+                time += Time.deltaTime;
+                float t = time / fadeOutDuration;
+                SetAlpha(Mathf.Lerp(startAlpha, 0f, t));
+                yield return null;
+            }
+
+            SetAlpha(0f);
+            _isMovingAfterCure = false;
+
+            gameObject.SetActive(false); // returned to pool AFTER fade
+        }
+
+
+        private void SetAlpha(float alpha)
+        {
+            if (spriteRenderer == null) return;
+
+            Color c = spriteRenderer.color;
+            c.a = alpha;
+            spriteRenderer.color = c;
         }
 
         public void SetState(HumanState state)
@@ -166,16 +261,17 @@ namespace Human
             sick.SetActive(state == HumanState.Sick);
         }
 
-        private bool _isWaiting = false;
-        [SerializeField] private GameObject _maskedObject;
 
         private void FixedUpdate()
         {
             _maskedObject.SetActive(isMasked);
             _feverObject.SetActive(currentState is HumanState.Sick);
+
+            if (_isMovingAfterCure)
+                return;
+
             if (isBeingDragged && _dragSource != null)
             {
-                // Follow player
                 transform.position = Vector3.Lerp(
                     transform.position,
                     _dragSource.position,
@@ -192,6 +288,7 @@ namespace Human
 
             _current.Move();
         }
+
 
 
         public bool CheckObstacle(Vector2 dir)
@@ -220,6 +317,42 @@ namespace Human
             _animator.speed = speed;
             _animatorMask.speed = speed;
             _isWaiting = false;
+        }
+        
+        private Transform GetRandomCuredDestination()
+        {
+            if (curedDestinations == null || curedDestinations.Length == 0)
+                return null;
+
+            return curedDestinations[Random.Range(0, curedDestinations.Length)];
+        }
+
+        
+        private IEnumerator MoveAfterCure()
+        {
+            Transform destination = GetRandomCuredDestination();
+            if (destination == null)
+            {
+                Debug.LogWarning("No cured destinations assigned", this);
+                yield break;
+            }
+
+            _isMovingAfterCure = true;
+
+            SetState(HumanState.Normal);
+
+            while (Vector2.Distance(transform.position, destination.position) > 0.1f)
+            {
+                transform.position = Vector3.MoveTowards(
+                    transform.position,
+                    destination.position,
+                    moveToCuredSpeed * Time.deltaTime
+                );
+
+                yield return null;
+            }
+
+            yield return FadeOutAndDisable();
         }
 
         public void ResetState()

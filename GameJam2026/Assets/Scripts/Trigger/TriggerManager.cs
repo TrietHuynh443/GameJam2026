@@ -51,6 +51,9 @@ namespace Trigger
                 case TriggerEventType.StopDrag:
                     HandleStopDrag(evt);
                     break;
+                case TriggerEventType.Cure:
+                    HandleCure(evt);
+                    break;
                 default:
                     Debug.LogWarning($"Unhandled TriggerEventType: {evt.EventType}");
                     break;
@@ -90,6 +93,14 @@ namespace Trigger
                 return;
 
             GameEvent.GameEvent.Publish(new EntityStopDragEvent(evt.TriggeredObject));
+        }        
+        
+        private void HandleCure(TriggerEvent evt)
+        {
+            if (evt.Phase != TriggerPhase.Enter)
+                return;
+
+            GameEvent.GameEvent.Publish(new EntityCureEvent(evt.TriggeredObject));
         }
         
         private void HandleFight(TriggerEvent evt)

@@ -23,8 +23,6 @@ namespace PlayerAction
         private Collider2D _dragTarget;
         private int _dragNum = 0;
 
-        [SerializeField] private float dragToggleCooldown = 0.25f;
-        
         private void Awake()
         {
             var playerMap = InputActions.FindActionMap("Player");

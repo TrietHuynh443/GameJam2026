@@ -5,10 +5,6 @@ using PlayerResources;
 using GameEvent.Events;
 using GameData;
 
-using GameData;
-using UnityEngine;
-using System.Collections;
-
 public class GameManager : MonoBehaviour
 {
     [Header("NPC Pool")]

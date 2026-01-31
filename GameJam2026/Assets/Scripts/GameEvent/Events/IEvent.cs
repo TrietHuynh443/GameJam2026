@@ -75,6 +75,17 @@ namespace GameEvent.Events
         {
             Target = target;
         }
+    }    
+    
+    public struct EntityCureEvent : IEvent
+    {
+        public GameObject Target;
+
+        public EntityCureEvent(GameObject target)
+        {
+            Target = target;
+        }
     }
+    
 
 }

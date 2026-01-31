@@ -32,6 +32,7 @@ namespace Trigger
         Drag,
         StopDrag,
         Fight,
+        Cure,
     }
 
     public enum TriggerPhase

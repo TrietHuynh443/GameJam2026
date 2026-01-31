@@ -1,4 +1,4 @@
-using DG.Tweening;
+using GameEvent.Events;
 using Trigger;
 using UnityEngine;
 
@@ -93,6 +93,15 @@ namespace Human
 
         public void Masked()
         {
+        }
+
+        public void Cured()
+        {
+            _controller.isMasked = true;
+            Debug.Log("I received a bonus mask!");
+            GameEvent.GameEvent.Publish(new ScoreEvent(0, 1));
+            _controller.SetState(HumanState.Normal);
+
         }
 
         public void RotateAround()

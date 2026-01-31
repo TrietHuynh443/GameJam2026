@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - Splash
+  - Hospital
   layers:
   - Default
   - TransparentFX
