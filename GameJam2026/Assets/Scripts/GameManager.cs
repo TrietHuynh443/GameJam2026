@@ -1,7 +1,9 @@
-﻿using UnityEngine;
+﻿using System.Collections;
 using Human;
+using UnityEngine;
 using PlayerResources;
 using GameEvent.Events;
+using GameData;
 
 public class GameManager : MonoBehaviour
 {
@@ -9,10 +11,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private NPCStateController npcPrefab;
     [SerializeField] private int poolSize = 50;
 
-    [Header("Spawn Count")]
-    public int normalCount = 20;
-    public int angryCount = 10;
-    public int sickCount = 5;
+    [Header("Waves")]
+    [SerializeField] private SpawnWave[] waves;
 
     [Header("Spawn Area")]
     public Vector2 minSpawn;
@@ -20,8 +20,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Transform spawnContainer;
 
     private ObjectPool<NPCStateController> _npcPool;
-    
-    
+
     private PlayerScore _score;
     public float score;
 
@@ -48,12 +47,36 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        SpawnGroup(HumanState.Normal, normalCount);
-        SpawnGroup(HumanState.Angry, angryCount);
-        SpawnGroup(HumanState.Sick, sickCount);
+        StartCoroutine(SpawnWaves());
+    }
 
-        _score.UpdateResource(PlayerResourceChangeReason.Normal, normalCount + angryCount);
-        _score.UpdateResource(PlayerResourceChangeReason.Infected, sickCount);
+    // ----------------------------
+    // WAVE SYSTEM
+    // ----------------------------
+    private IEnumerator SpawnWaves()
+    {
+        for (int i = 0; i < waves.Length; i++)
+        {
+            Debug.Log("Spawning wave " + (i + 1));
+            SpawnWave wave = waves[i];
+
+            SpawnGroup(HumanState.Normal, wave.normalCount);
+            SpawnGroup(HumanState.Angry, wave.angryCount);
+            SpawnGroup(HumanState.Sick, wave.sickCount);
+
+            // Update score/resources
+            _score.UpdateResource(
+                PlayerResourceChangeReason.Normal,
+                wave.normalCount + wave.angryCount
+            );
+
+            _score.UpdateResource(
+                PlayerResourceChangeReason.Infected,
+                wave.sickCount
+            );
+
+            yield return new WaitForSeconds(wave.delayAfterWave);
+        }
     }
 
     private void SpawnGroup(HumanState state, int count)

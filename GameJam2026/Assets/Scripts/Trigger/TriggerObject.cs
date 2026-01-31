@@ -6,11 +6,10 @@ namespace Trigger
     public class TriggerObject : MonoBehaviour
     {
         public TriggerEventType triggerType;
-        private int triggeredLayer;
 
-        private void Awake()
+        protected virtual void Awake()
         {
-            triggeredLayer = LayerMask.NameToLayer("Triggered");
+            
         }
 
         private void Reset()
@@ -18,19 +17,19 @@ namespace Trigger
             GetComponent<Collider2D>().isTrigger = true;
         }
 
-        private void OnTriggerEnter2D(Collider2D other)
+        protected virtual void OnTriggerEnter2D(Collider2D other)
         {
             RaiseEvent(other, TriggerPhase.Enter);
         }
-        private void OnTriggerStay2D(Collider2D other)
+        protected virtual void OnTriggerStay2D(Collider2D other)
         {
             RaiseEvent(other, TriggerPhase.Stay);
         }
-        private void OnTriggerExit2D(Collider2D other)
+        protected virtual void OnTriggerExit2D(Collider2D other)
         {
             RaiseEvent(other, TriggerPhase.Exit);
         }
-        private void RaiseEvent(Collider2D other, TriggerPhase phase)
+        protected virtual void RaiseEvent(Collider2D other, TriggerPhase phase)
         {
             TriggerEvent evt = new TriggerEvent(this, other.gameObject, triggerType, phase);
             GameEvent.GameEvent.Publish(evt);

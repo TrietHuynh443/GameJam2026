@@ -63,7 +63,7 @@ namespace Trigger
         }
         private void HandleApplyMask(TriggerEvent evt)
         {
-            if (evt.Phase != TriggerPhase.Enter)
+            if (evt.Phase != TriggerPhase.Stay)
                 return;
 
             GameEvent.GameEvent.Publish(new EntityMaskedEvent(evt.TriggeredObject));
