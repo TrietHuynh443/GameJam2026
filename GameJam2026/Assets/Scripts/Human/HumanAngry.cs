@@ -18,6 +18,7 @@ namespace Human
         
         [SerializeField] private Animator _animator;
         [SerializeField] private Animator _animatorMask;
+        [SerializeField] private Animator _angryAnimator;
         
         [Header("Block Mask Params")]
         public float angryDuration = 5f;
@@ -137,6 +138,9 @@ namespace Human
                 _animator.Play(animationName);
                 if (_animatorMask.gameObject.activeSelf)
                     _animatorMask.Play(animationName);
+                
+                if (_angryAnimator.gameObject.activeSelf)
+                    _angryAnimator.Play(animationName);
             }
         }
     }

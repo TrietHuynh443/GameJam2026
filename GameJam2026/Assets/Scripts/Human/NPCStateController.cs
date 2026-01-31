@@ -58,6 +58,7 @@ namespace Human
         [SerializeField] private GameObject _sickIcon;
         
         [SerializeField] private GameObject _feverObject;
+        [SerializeField] private GameObject _angryObject;
         private IHuman _current;
         private void OnEnable()
         {
@@ -191,6 +192,7 @@ namespace Human
         {
             _maskedObject.SetActive(isMasked);
             _feverObject.SetActive(currentState is HumanState.Sick);
+            _angryObject.SetActive(currentState is HumanState.Angry);
             if (isBeingDragged && _dragSource != null)
             {
                 // Follow player
