@@ -14,31 +14,38 @@ namespace PlayerAction
         private InputAction _move;
         private InputAction _sprint;
         private InputAction _applyMask;
+        private InputAction _drag;
         private Animator _animator;
 
         private HumanDirectionType _currentDir = HumanDirectionType.Bottom;
         private bool _wasMoving;
+        private bool _isDragging = false;
+        private Collider2D _dragTarget;
+        private float _nextDragAllowedTime;
+
+        [SerializeField] private float dragToggleCooldown = 0.25f;
         
-        private TriggerObject _currentTrigger;
-        private bool _interactPressed;
-
-
         private void Awake()
         {
             var playerMap = InputActions.FindActionMap("Player");
             _move = playerMap.FindAction("Move");
             _sprint = playerMap.FindAction("Sprint");
             _applyMask = playerMap.FindAction("Interact");
+            _drag = playerMap.FindAction("Drag");
+            
 
             _animator = GetComponent<Animator>();
         }
 
-        private void OnEnable()
+        protected override void OnEnable()
         {
             _move.Enable();
             _sprint.Enable();
             _applyMask.Enable();
+            _drag.Enable();
             isAuto = false;
+            
+            base.OnEnable();
         }
 
         private void OnDisable()
@@ -46,16 +53,44 @@ namespace PlayerAction
             _move.Disable();
             _sprint.Disable();
             _applyMask.Disable();
+            _drag.Disable();
         }
 
         protected override void OnTriggerStay2D(Collider2D other)
         {
+            // 1. Independent action (Masking)
             if (_applyMask.IsPressed())
             {
-                RaiseEvent(other, TriggerPhase.Stay);
+                ExecuteActions(other, TriggerPhase.Stay, TriggerEventType.ApplyMask);
+            }
+
+            // 2. Guard Clauses for Dragging
+            if (!_drag.IsPressed()) return;
+            if (Time.time < _nextDragAllowedTime) return;
+
+            // 3. Logic Branching
+            if (!_isDragging)
+            {
+                // START DRAGGING
+                _isDragging = true;
+                _dragTarget = other;
+                ExecuteActions(_dragTarget, TriggerPhase.Stay, TriggerEventType.Drag);
+        
+                // Apply cooldown after starting
+                _nextDragAllowedTime = Time.time + dragToggleCooldown;
+            }
+            else if (_dragTarget == other)
+            {
+                // STOP DRAGGING
+                ExecuteActions(_dragTarget, TriggerPhase.Stay, TriggerEventType.StopDrag);
+                _isDragging = false;
+                _dragTarget = null;
+
+                // Apply cooldown after stopping
+                _nextDragAllowedTime = Time.time + dragToggleCooldown;
             }
         }
-
+        
         private void Update()
         {
             Vector2 input = _move.ReadValue<Vector2>();

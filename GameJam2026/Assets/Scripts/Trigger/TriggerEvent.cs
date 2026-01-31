@@ -29,6 +29,8 @@ namespace Trigger
         None,
         ApplyMask,
         Infect,
+        Drag,
+        StopDrag,
         Fight,
     }
 

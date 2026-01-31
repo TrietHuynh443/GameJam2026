@@ -24,13 +24,15 @@ namespace Human
         [SerializeField] private NPCStateController _controller;
         private float _timer;
 
-        private void OnEnable()
+
+        protected override void OnEnable()
         {
             gameObject.layer = LayerMask.NameToLayer("NPC");
-            triggerType = TriggerEventType.Infect;
             _startTime = int.MinValue;
             _controller.isMasked = false;
+            base.OnEnable();
         }
+
 
         public void Move()
         {
@@ -65,6 +67,11 @@ namespace Human
             _avoidDir = HumanDirectionType.None;
 
             return (HumanDirectionType)dir;
+        }
+
+        protected override void OnTriggerEnter2D(Collider2D other)
+        {
+            ExecuteActions(other, TriggerPhase.Enter, TriggerEventType.Infect);
         }
 
         public void Back()
