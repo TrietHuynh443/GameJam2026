@@ -17,66 +17,73 @@ namespace Human
         private float _timer;
         private bool _isFaceWall = false;
         [SerializeField] private Transform _transform;
-        private SickHuman _sickHuman;
-        private HumanNormal _normalHuman;
+        [SerializeField] private NPCStateController _controller;
+        
+        [SerializeField] private Animator _animator;
         
         [Header("Block Mask Params")]
         public float angryDuration = 5f;
-        
-        private void Start()
-        {
-            _sickHuman = _transform.GetComponentInChildren<SickHuman>(includeInactive: true);
-            _normalHuman = _transform.GetComponentInChildren<HumanNormal>(includeInactive: true);
-            StopAllCoroutines();
-            StartCoroutine(CalmDownAfterTime());
-        }
-        
+
+        private HumanDirectionType _avoidDir = 0;
+
+
         private void OnEnable()
         {
+            StopAllCoroutines();
+            StartCoroutine(CalmDownAfterTime());
             GameEvent.GameEvent.Subscribe<EntityFightEvent>(Fight);
-            GameEvent.GameEvent.Subscribe<InfectedEvent>(Infected);
-
         }
 
         private void OnDisable()
         {
             GameEvent.GameEvent.Unsubscribe<EntityFightEvent>(Fight);
-            GameEvent.GameEvent.Unsubscribe<InfectedEvent>(Infected);
         }
-        private void Infected(InfectedEvent obj)
+        public void Infected()
         {
-            Debug.Log("Infected ");
-            if (obj.Human != gameObject)
-            {
-                return;
-            }
-
             if (isMasked)
             {
                 isMasked = false;
                 return;
             }
-
-            gameObject.SetActive(false);
-            _sickHuman.gameObject.SetActive(true);
+            
+            _controller.SetState(HumanState.Sick);
+            
         }
-        
-        void FixedUpdate()
+
+        public void Masked()
+        {
+            isMasked = true;
+        }
+
+        public void RotateAround()
+        {
+            
+        }
+
+        public void Move()
         {
             _timer += Time.fixedDeltaTime;
 
             if (_timer >= changeDirectionTime)
             {
                 _moveDirection = GetDirection();
+                PlayAnimation(_moveDirection);
                 _timer = 0f;
             }
 
+            if (_controller.CheckObstacle(HumanDirectionExtension.DirectionMap[_moveDirection]))
+            {
+                _avoidDir = _moveDirection;
+                _moveDirection = GetDirection();
+                return;
+            }
             Vector3 nextPos = transform.position + (Vector3)(HumanDirectionExtension.DirectionMap[_moveDirection] * moveSpeed * Time.fixedDeltaTime);
             
             if (nextPos.x < minBounds.x || nextPos.x > maxBounds.x ||
                 nextPos.y < minBounds.y || nextPos.y > maxBounds.y)
             {
                 _moveDirection = GetDirection();
+                PlayAnimation(_moveDirection);
                 return;
             }
 
@@ -85,13 +92,14 @@ namespace Human
 
         private HumanDirectionType GetDirection()
         {
-            if (_isFaceWall)
+            var dir = Random.Range(0, 7);
+            if ((HumanDirectionType)dir == _avoidDir)
             {
-                _isFaceWall = false;
-                return HumanDirectionExtension.GetReverseDirection(_moveDirection);
+                dir = (dir + 1) % 8;
             }
+            _avoidDir = HumanDirectionType.None;
 
-            return (HumanDirectionType)Random.Range(0, 7);
+            return (HumanDirectionType)dir;
         }
 
         public void Back()
@@ -118,9 +126,19 @@ namespace Human
         {
             yield return new WaitForSeconds(angryDuration);
             Debug.Log($"{name} calmed down 😮‍💨");
-            _normalHuman.gameObject.SetActive(true);
-            _normalHuman.isMasked = isMasked;
-            gameObject.SetActive(false);
+            
+            if (!gameObject.activeSelf) yield break;
+            
+            _controller.SetState(HumanState.Normal);
+        }
+        
+        private void PlayAnimation(HumanDirectionType direction)
+        {
+            string animationName = HumanDirectionExtension.DirectionNameMap[direction];
+            if (!_animator.GetCurrentAnimatorStateInfo(0).IsName(animationName))
+            {
+                _animator.Play(animationName);
+            }
         }
     }
 }
